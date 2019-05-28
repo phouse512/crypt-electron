@@ -9,6 +9,14 @@ export function* sayHello() {
   console.log('HELLO');
 }
 
+function* checkExistingUser() {
+  console.log('checking existing user.');
+}
+
+export function* watchCheckExisting() {
+  yield takeLatest(authConstants.CHECK_EXISTING_USER, checkExistingUser);
+}
+
 export function* watchLogin() {
   yield takeEvery(authConstants.USER_LOGIN, sayHello);
 }

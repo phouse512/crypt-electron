@@ -7,10 +7,13 @@ const paths = {
 };
 
 module.exports = {
-  entry: ['babel-polyfill', path.join(paths.SRC, 'renderer/index.jsx')],
+  entry: [
+    'babel-polyfill', 
+    path.join(paths.SRC, 'main/main.js'), 
+  ],
   output: {
     path: paths.DIST,
-    filename: 'app.bundle.js',
+    filename: 'main.bundle.js',
     publicPath: '/public/',
   },
   plugins: [
@@ -29,4 +32,5 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
   },
+  target: 'electron-main',
 };
