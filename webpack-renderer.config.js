@@ -32,4 +32,5 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
   },
+  target: 'electron-renderer',
 };

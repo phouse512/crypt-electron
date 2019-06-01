@@ -6,6 +6,8 @@
   "scripts": {
     "build:main": "webpack --config webpack-main.config.js",
     "build:renderer": "webpack --config webpack-renderer.config.js",
+    "build:main:watch": "webpack --config webpack-main.config.js --watch",
+    "build:renderer:watch": "webpack --config webpack-renderer.config.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron ."
   },
@@ -27,6 +29,7 @@
     "webpack-cli": "^3.3.2"
   },
   "dependencies": {
+    "electron-better-ipc": "^0.3.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",

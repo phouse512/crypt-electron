@@ -1,5 +1,5 @@
 import { put, call, takeLatest, takeEvery } from 'redux-saga/effects';
-
+const { ipcRenderer: ipc } = require('electron-better-ipc');
 import {
   authConstants,
 } from '../constants';
@@ -11,6 +11,8 @@ export function* sayHello() {
 
 function* checkExistingUser() {
   console.log('checking existing user.');
+  const existingUser = yield ipc.callMain('check-existing-user', 'TESTUSER');
+  console.log(existingUser)
 }
 
 export function* watchCheckExisting() {

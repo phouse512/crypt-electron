@@ -1,4 +1,5 @@
 const { app, BrowserWindow} = require('electron');
+require('./ipc');
 
 let mainWindow;
 

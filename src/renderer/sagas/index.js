@@ -1,1 +1,4 @@
-export { watchLogin } from './user_saga';
+export { 
+  watchLogin,
+  watchCheckExisting,
+} from './user_saga';

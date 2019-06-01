@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 
+import { checkUserLogin } from '../actions/auth.actions';
+
 export class AppWrapperComponent extends React.Component {
   componentWillMount() {
     console.log("I should check if A user is logged in.")
+    this.props.checkExistingUser();
   }
 
   render() {
@@ -21,7 +24,9 @@ export class AppWrapperComponent extends React.Component {
 AppWrapperComponent.propTypes = {};
 
 const mapStateToProps = ({}) => ({});
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  checkExistingUser: () => dispatch(checkUserLogin()),
+});
 
 const AppWrapper = connect(
   mapStateToProps,
