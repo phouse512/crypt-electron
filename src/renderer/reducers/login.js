@@ -2,6 +2,8 @@ import { authConstants } from '../constants';
 
 const baseState = {
   isLoading: false,
+  newUser: true,
+  userData: {},
 };
 
 const login = (state = baseState, action) => {

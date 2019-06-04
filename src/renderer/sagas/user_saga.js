@@ -3,7 +3,7 @@ const { ipcRenderer: ipc } = require('electron-better-ipc');
 import {
   authConstants,
 } from '../constants';
-import { userLogin } from '../actions/auth.actions';
+import { setNewUser, userLogin } from '../actions/auth.actions';
 
 export function* sayHello() {
   console.log('HELLO');
@@ -11,8 +11,17 @@ export function* sayHello() {
 
 function* checkExistingUser() {
   console.log('checking existing user.');
-  const existingUser = yield ipc.callMain('check-existing-user', 'TESTUSER');
-  console.log(existingUser)
+  const resp = yield ipc.callMain('check-existing-user', 'TESTUSER');
+  if (resp.error) {
+    console.error('Received error from ipc main');
+    return;
+  }
+
+  if (resp.data.exists) {
+    console.log('here is an existing user')
+  } else {
+    yield put(setNewUser(true));
+  }
 }
 
 export function* watchCheckExisting() {

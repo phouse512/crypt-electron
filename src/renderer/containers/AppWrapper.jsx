@@ -12,10 +12,18 @@ export class AppWrapperComponent extends React.Component {
   }
 
   render() {
+    if (this.props.login.newUser) {
+      return (
+        <div className="container-flex">
+          Welcome new user!
+        </div>
+      );
+    }
+
     return (
       <div className="container-flex">
 
-        HELLO, checking if I exist.
+        Welcome existing user!
       </div>
     );
   }
@@ -23,7 +31,9 @@ export class AppWrapperComponent extends React.Component {
 
 AppWrapperComponent.propTypes = {};
 
-const mapStateToProps = ({}) => ({});
+const mapStateToProps = (state) => ({
+  login: state.login,
+});
 const mapDispatchToProps = dispatch => ({
   checkExistingUser: () => dispatch(checkUserLogin()),
 });
