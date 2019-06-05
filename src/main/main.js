@@ -1,5 +1,7 @@
 const { app, BrowserWindow} = require('electron');
 require('./ipc');
+const path = require('path');
+const os = require('os');
 
 let mainWindow;
 
@@ -15,6 +17,10 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html')
+
+  BrowserWindow.addDevToolsExtension(
+    path.join(os.homedir(), '/Library/Application Support/Google/Chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0')
+  );
 
   // open DevTools.
   mainWindow.webContents.openDevTools()

@@ -1,4 +1,5 @@
 export { 
-  watchLogin,
   watchCheckExisting,
+  watchLogin,
+  watchUnlockAccount,
 } from './user_saga';

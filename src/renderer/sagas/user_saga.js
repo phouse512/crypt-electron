@@ -19,9 +19,15 @@ function* checkExistingUser() {
 
   if (resp.data.exists) {
     console.log('here is an existing user')
+    yield put(setNewUser(false));
   } else {
+    console.log('is a new user')
     yield put(setNewUser(true));
   }
+}
+
+function* unlockUserCredentials(action) {
+  console.log(action);
 }
 
 export function* watchCheckExisting() {
@@ -30,4 +36,8 @@ export function* watchCheckExisting() {
 
 export function* watchLogin() {
   yield takeEvery(authConstants.USER_LOGIN, sayHello);
+}
+
+export function* watchUnlockAccount() {
+  yield takeEvery(authConstants.UNLOCK_ACCOUNT, unlockUserCredentials);
 }

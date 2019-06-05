@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { checkUserLogin } from '../actions/auth.actions';
+import { checkUserLogin, unlockAccount } from '../actions/auth.actions';
+import { isEmpty } from '../../util/object';
+
+import MasterPassForm from '../components/forms/MasterPassForm';
 
 export class AppWrapperComponent extends React.Component {
   componentWillMount() {
@@ -12,12 +15,24 @@ export class AppWrapperComponent extends React.Component {
   }
 
   render() {
-    if (this.props.login.newUser) {
+    if (this.props.newUser) {
       return (
         <div className="container-flex">
           Welcome new user!
         </div>
       );
+    }
+
+    // if there is no local muk or srp data, we need to recompute
+    if (!this.props.newUser && isEmpty(this.props.mukData)) {
+      return (
+        <div className="container-flex">
+          Time to unlock, give us your master password.
+          <MasterPassForm
+            onSubmit={values => this.props.unlockAccount(values.masterpass)}
+          />
+        </div>
+      )
     }
 
     return (
@@ -32,10 +47,14 @@ export class AppWrapperComponent extends React.Component {
 AppWrapperComponent.propTypes = {};
 
 const mapStateToProps = (state) => ({
-  login: state.login,
+  newUser: state.login.newUser,
+  isLoading: state.login.isLoading,
+  mukData: state.login.mukData,
+  srpData: state.login.srpData,
 });
 const mapDispatchToProps = dispatch => ({
   checkExistingUser: () => dispatch(checkUserLogin()),
+  unlockAccount: (masterPass) => dispatch(unlockAccount({ masterPass })),
 });
 
 const AppWrapper = connect(

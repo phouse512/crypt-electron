@@ -10,11 +10,14 @@ ipc.answerRenderer('check-existing-user', async data => {
   try {
     if (fs.existsSync(userConfigPath)) {
       // TODO: validate that the data file is valid
+      let rawData = fs.readFileSync(userConfigPath);
+      let jsonData = JSON.parse(rawData);
+      console.log(jsonData);
       return {
         error: false,
         data: {
           exists: true,
-          userData: {},
+          userData: jsonData,
         },
       };
     } else {
