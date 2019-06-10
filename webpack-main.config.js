@@ -11,6 +11,15 @@ module.exports = {
     'babel-polyfill', 
     path.join(paths.SRC, 'main/main.js'), 
   ],
+  externals: [
+    function(context, request, callback) {
+      if (request.match(/devtron/)) {
+        return callback(null, 'commonjs ' + request);
+      }
+
+      callback();
+    },
+  ],
   output: {
     path: paths.DIST,
     filename: 'main.bundle.js',
@@ -33,4 +42,7 @@ module.exports = {
     extensions: ['.js', '.jsx'],
   },
   target: 'electron-main',
+  node: {
+    __dirname: false,
+  },
 };

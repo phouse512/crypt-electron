@@ -18,6 +18,10 @@ const login = (state = baseState, action) => {
       return Object.assign({}, state, {
         newUser: action.isNewUser,
       });
+    case authConstants.SET_USER_LOCAL_DATA:
+      return Object.assign({}, state, {
+        localUserData: action.localData,
+      });
     default:
       return state;
   }
