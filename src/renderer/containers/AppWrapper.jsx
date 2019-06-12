@@ -7,6 +7,7 @@ import { checkUserLogin, unlockAccount } from '../actions/auth.actions';
 import { isEmpty } from '../../util/object';
 
 import MasterPassForm from '../components/forms/MasterPassForm';
+import NewUser from '../components/NewUser';
 
 export class AppWrapperComponent extends React.Component {
   componentWillMount() {
@@ -18,7 +19,10 @@ export class AppWrapperComponent extends React.Component {
     if (this.props.newUser) {
       return (
         <div className="container-flex">
-          Welcome new user!
+          Welcome!
+          <NewUser
+            registerNew={true}
+          />
         </div>
       );
     }
