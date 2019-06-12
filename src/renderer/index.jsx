@@ -5,6 +5,7 @@ import { render } from 'react-dom';
 import { HashRouter, Route } from 'react-router-dom';
 import createSagaMiddleware from 'redux-saga';
 
+import AppWrapper from './containers/AppWrapper';
 import cryptApp from './reducers/index';
 import initSagas from './initSagas';
 
@@ -26,7 +27,7 @@ initSagas(sagaMiddleware);
 const App = () => (
   <HashRouter>
     <div>
-      <h3>HELLO v2</h3>
+     <AppWrapper />
     </div>
   </HashRouter>
 );
