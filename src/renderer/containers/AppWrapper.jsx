@@ -4,6 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { checkUserLogin, unlockAccount } from '../actions/auth.actions';
+import { changeNewUser } from '../actions/setup.actions';
 import { isEmpty } from '../../util/object';
 
 import MasterPassForm from '../components/forms/MasterPassForm';
@@ -21,7 +22,8 @@ export class AppWrapperComponent extends React.Component {
         <div className="container-flex">
           Welcome!
           <NewUser
-            registerNew={true}
+            changeRegisterNew={this.props.changeRegisterNew}
+            registerNew={this.props.registerNew}
           />
         </div>
       );
@@ -51,12 +53,14 @@ export class AppWrapperComponent extends React.Component {
 AppWrapperComponent.propTypes = {};
 
 const mapStateToProps = (state) => ({
+  registerNew: state.setup.registerNew,
   newUser: state.login.newUser,
   isLoading: state.login.isLoading,
   mukData: state.login.mukData,
   srpData: state.login.srpData,
 });
 const mapDispatchToProps = dispatch => ({
+  changeRegisterNew: (change) => dispatch(changeNewUser(change)),
   checkExistingUser: () => dispatch(checkUserLogin()),
   unlockAccount: (masterPass) => dispatch(unlockAccount({ masterPass })),
 });

@@ -1,4 +1,4 @@
-/* eslint import/prefer-default-explort: "off" */
+/* eslint import/prefer-default-export: "off" */
 
 export const authConstants = {
   USER_LOGIN: 'AUTH_USER_LOGIN',
