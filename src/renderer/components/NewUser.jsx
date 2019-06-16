@@ -6,13 +6,16 @@ import NewUserForm from './forms/NewUserForm';
 const NewUser = ({
   changeRegisterNew,
   registerNew,
+  registrationHandler,
 }) => (
   <div>
     {registerNew ? (
       <div>
         <h4>Register New Account</h4>
 
-        <NewUserForm />
+        <NewUserForm
+          onSubmit={values => { console.log(values); registrationHandler(values.email, values.username)}}
+        />
         
         <p onClick={() => changeRegisterNew(false)}>
           Click here if you already have an account.
@@ -38,6 +41,7 @@ NewUser.defaultProps = {};
 NewUser.PropTypes = {
   changeRegisterNew: PropTypes.func.isRequired,
   registerNew: PropTypes.bool.isRequired,
+  registrationHandler: PropTypes.bool.isRequired,
 };
 
 export default NewUser;

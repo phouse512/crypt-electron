@@ -2,12 +2,14 @@ import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
 const { ipcRenderer: ipc } = require('electron-better-ipc');
 import {
   authConstants,
+  setupConstants,
 } from '../constants';
 import {
   setNewUser,
   setUserLocalData,
   userLogin,
 } from '../actions/auth.actions';
+import { invitationRequest } from '../api/invitation';
 
 const getLocalData = (state) => state.login.localUserData;
 
@@ -46,7 +48,6 @@ function* unlockUserCredentials(action) {
     salt: localUserData.accountSalt,
     secretKey: localUserData.secretKey,
   };
-  console.log('CRED DATA: ', credData);
  
   // compute promotional
   try {
@@ -58,8 +59,25 @@ function* unlockUserCredentials(action) {
   }
 }
 
+function* createInvitationRequest(action) {
+  try {
+    console.log(action)
+    const result = yield invitationRequest({
+      email: action.email,
+      username: action.username,
+    })
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export function* watchCheckExisting() {
   yield takeLatest(authConstants.CHECK_EXISTING_USER, checkExistingUser);
+}
+
+export function* watchCreateInvitation() {
+  yield takeLatest(setupConstants.CREATE_INVITATION_REQUEST, createInvitationRequest);
 }
 
 export function* watchLogin() {
