@@ -10,3 +10,14 @@ export const invitationRequest = ({ email, username }) => ({
   email,
   username,
 });
+
+export const setInvitation = ({ accountId, uuid }) => ({
+  type: setupConstants.SET_INVITATION,
+  accountId,
+  uuid,
+});
+
+export const setLoadingFlag = (isLoading) => ({
+  type: setupConstants.SET_LOADING_FLAG,
+  isLoading,
+});

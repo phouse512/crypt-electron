@@ -5,6 +5,7 @@ import NewUserForm from './forms/NewUserForm';
 
 const NewUser = ({
   changeRegisterNew,
+  loading,
   registerNew,
   registrationHandler,
 }) => (
@@ -13,9 +14,14 @@ const NewUser = ({
       <div>
         <h4>Register New Account</h4>
 
-        <NewUserForm
-          onSubmit={values => { console.log(values); registrationHandler(values.email, values.username)}}
-        />
+        {loading ? (
+          <p>Loading</p>
+        ) : (
+          <NewUserForm
+            onSubmit={values => { console.log(values); registrationHandler(values.email, values.username)}}
+          />
+        )}
+
         
         <p onClick={() => changeRegisterNew(false)}>
           Click here if you already have an account.
@@ -36,10 +42,13 @@ const NewUser = ({
   </div>
 );
 
-NewUser.defaultProps = {};
+NewUser.defaultProps = {
+  loading: false,
+};
 
 NewUser.PropTypes = {
   changeRegisterNew: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
   registerNew: PropTypes.bool.isRequired,
   registrationHandler: PropTypes.bool.isRequired,
 };

@@ -10,6 +10,7 @@ import { isEmpty } from '../../util/object';
 
 import MasterPassForm from '../components/forms/MasterPassForm';
 import NewUser from '../components/NewUser';
+import { stat } from 'fs';
 
 export class AppWrapperComponent extends React.Component {
   componentWillMount() {
@@ -24,6 +25,7 @@ export class AppWrapperComponent extends React.Component {
           Welcome!
           <NewUser
             changeRegisterNew={this.props.changeRegisterNew}
+            loading={this.props.setup.loading}
             registerNew={this.props.registerNew}
             registrationHandler={this.props.registrationHandler}
           />
@@ -55,6 +57,7 @@ export class AppWrapperComponent extends React.Component {
 AppWrapperComponent.propTypes = {};
 
 const mapStateToProps = (state) => ({
+  setup: state.setup,
   registerNew: state.setup.registerNew,
   newUser: state.login.newUser,
   isLoading: state.login.isLoading,

@@ -9,6 +9,7 @@ import {
   setUserLocalData,
   userLogin,
 } from '../actions/auth.actions';
+import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
 import { invitationRequest } from '../api/invitation';
 
 const getLocalData = (state) => state.login.localUserData;
@@ -61,12 +62,16 @@ function* unlockUserCredentials(action) {
 
 function* createInvitationRequest(action) {
   try {
-    console.log(action)
+    yield put(setLoadingFlag(true));
     const result = yield invitationRequest({
       email: action.email,
       username: action.username,
     })
-    console.log(result);
+    yield put(setInvitation({
+      accountId: result.data.account_id,
+      uuid: result.data.uuid,
+    }));
+    yield put(setLoadingFlag(false));
   } catch (error) {
     console.log(error);
   }
