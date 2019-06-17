@@ -2,12 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
+import 'whatwg-fetch';
 
 import { checkUserLogin, unlockAccount } from '../actions/auth.actions';
+import { changeNewUser, invitationRequest } from '../actions/setup.actions';
 import { isEmpty } from '../../util/object';
 
 import MasterPassForm from '../components/forms/MasterPassForm';
 import NewUser from '../components/NewUser';
+import { stat } from 'fs';
 
 export class AppWrapperComponent extends React.Component {
   componentWillMount() {
@@ -21,7 +24,10 @@ export class AppWrapperComponent extends React.Component {
         <div className="container-flex">
           Welcome!
           <NewUser
-            registerNew={true}
+            changeRegisterNew={this.props.changeRegisterNew}
+            loading={this.props.setup.loading}
+            registerNew={this.props.registerNew}
+            registrationHandler={this.props.registrationHandler}
           />
         </div>
       );
@@ -51,13 +57,17 @@ export class AppWrapperComponent extends React.Component {
 AppWrapperComponent.propTypes = {};
 
 const mapStateToProps = (state) => ({
+  setup: state.setup,
+  registerNew: state.setup.registerNew,
   newUser: state.login.newUser,
   isLoading: state.login.isLoading,
   mukData: state.login.mukData,
   srpData: state.login.srpData,
 });
 const mapDispatchToProps = dispatch => ({
+  changeRegisterNew: (change) => dispatch(changeNewUser(change)),
   checkExistingUser: () => dispatch(checkUserLogin()),
+  registrationHandler: (email, username) => dispatch(invitationRequest({ email, username })),
   unlockAccount: (masterPass) => dispatch(unlockAccount({ masterPass })),
 });
 
