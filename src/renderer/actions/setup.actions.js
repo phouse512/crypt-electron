@@ -5,15 +5,19 @@ export const changeNewUser = (registerNew) => ({
   registerNew,
 });
 
-export const invitationRequest = ({ email, username }) => ({
+export const invitationRequest = ({ email, firstName, lastName, username }) => ({
   type: setupConstants.CREATE_INVITATION_REQUEST,
   email,
+  firstName,
+  lastName,
   username,
 });
 
-export const setInvitation = ({ accountId, uuid }) => ({
+export const setInvitation = ({ accountId, firstName, lastName, uuid }) => ({
   type: setupConstants.SET_INVITATION,
   accountId,
+  firstName,
+  lastName,
   uuid,
 });
 

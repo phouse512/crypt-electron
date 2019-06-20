@@ -69,6 +69,8 @@ function* createInvitationRequest(action) {
     })
     yield put(setInvitation({
       accountId: result.data.account_id,
+      firstName: action.firstName,
+      lastName: action.lastName,
       uuid: result.data.uuid,
     }));
     yield put(setLoadingFlag(false));

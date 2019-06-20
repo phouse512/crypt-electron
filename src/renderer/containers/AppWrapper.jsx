@@ -67,7 +67,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = dispatch => ({
   changeRegisterNew: (change) => dispatch(changeNewUser(change)),
   checkExistingUser: () => dispatch(checkUserLogin()),
-  registrationHandler: (email, username) => dispatch(invitationRequest({ email, username })),
+  registrationHandler: (email, firstName, lastName, username) => dispatch(
+    invitationRequest({ email, firstName, lastName, username })),
   unlockAccount: (masterPass) => dispatch(unlockAccount({ masterPass })),
 });
 

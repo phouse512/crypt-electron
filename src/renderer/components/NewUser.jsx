@@ -18,10 +18,14 @@ const NewUser = ({
           <p>Loading</p>
         ) : (
           <NewUserForm
-            onSubmit={values => { console.log(values); registrationHandler(values.email, values.username)}}
+            onSubmit={values => registrationHandler(
+              values.email, 
+              values.firstName, 
+              values.lastName, 
+              values.username,
+            )}
           />
         )}
-
         
         <p onClick={() => changeRegisterNew(false)}>
           Click here if you already have an account.
