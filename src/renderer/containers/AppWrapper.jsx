@@ -26,6 +26,7 @@ export class AppWrapperComponent extends React.Component {
           <NewUser
             changeRegisterNew={this.props.changeRegisterNew}
             loading={this.props.setup.loading}
+            invitation={this.props.setup.invitation}
             registerNew={this.props.registerNew}
             registrationHandler={this.props.registrationHandler}
           />

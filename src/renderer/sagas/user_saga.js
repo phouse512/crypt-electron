@@ -79,6 +79,27 @@ function* createInvitationRequest(action) {
   }
 }
 
+function* setMasterPass(action) {
+  try {
+    yield put(setLoadingFlag(true));
+    // get new salt
+    // get new secret key
+    // derive private keys
+
+    // generate public/private keypair
+
+    // generate symmetric 
+
+    // generate srpx 
+
+    // upload keyset to server
+
+    // generate file 
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export function* watchCheckExisting() {
   yield takeLatest(authConstants.CHECK_EXISTING_USER, checkExistingUser);
 }
