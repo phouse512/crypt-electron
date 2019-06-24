@@ -96,6 +96,28 @@ export const derivePrivateKeys = ({
       salt: srpSalt,
     },
   };
+};
+
+export const generateSecretKey = () => {
+  const intSet = [...Array(8).keys()].map(obj => obj + 1);
+  const charSet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  const charSet2 = ['J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T'];
+  const charSet3 = ['V', 'W', 'X', 'Y', 'Z'];
+
+  const allSet = intSet.concat(charSet, charSet2, charSet3);
+  let key = '';
+  for (var i; i < 32; i++) {
+    const randElem = allSet[Math.floor(Math.random() * allSet.length)];
+    key = key.concat(randElem);
+  }
+
+  return key;
+}
+
+export const generateSalt = () => {
+  const buf = Buffer.alloc(16);
+  crypto.randomFillSync(buf, 0, 16);
+  return buf;
 }
 
 // derivePrivateKeys({

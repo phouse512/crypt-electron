@@ -69,11 +69,34 @@ function* createInvitationRequest(action) {
     })
     yield put(setInvitation({
       accountId: result.data.account_id,
+      firstName: action.firstName,
+      lastName: action.lastName,
       uuid: result.data.uuid,
     }));
     yield put(setLoadingFlag(false));
   } catch (error) {
     console.log(error);
+  }
+}
+
+function* setMasterPass(action) {
+  try {
+    yield put(setLoadingFlag(true));
+    // get new salt
+    // get new secret key
+    // derive private keys
+
+    // generate public/private keypair
+
+    // generate symmetric 
+
+    // generate srpx 
+
+    // upload keyset to server
+
+    // generate file 
+  } catch (error) {
+    console.error(error);
   }
 }
 

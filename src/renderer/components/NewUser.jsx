@@ -1,34 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import NewCredentialsForm from './forms/NewCredentialsForm';
 import NewUserForm from './forms/NewUserForm';
+
+const isEmpty = (object) => (
+  Object.entries(object).length === 0 && object.constructor === Object
+);
 
 const NewUser = ({
   changeRegisterNew,
   loading,
+  invitation,
   registerNew,
   registrationHandler,
-}) => (
-  <div>
-    {registerNew ? (
-      <div>
-        <h4>Register New Account</h4>
-
-        {loading ? (
-          <p>Loading</p>
-        ) : (
-          <NewUserForm
-            onSubmit={values => { console.log(values); registrationHandler(values.email, values.username)}}
-          />
-        )}
-
-        
-        <p onClick={() => changeRegisterNew(false)}>
-          Click here if you already have an account.
-        </p>
-      </div>
-      
-    ) : (
+}) => {
+  if (!registerNew) {
+    return (
       <div>
         <h4>Login Existing Account</h4>
 
@@ -38,9 +26,42 @@ const NewUser = ({
           Click here if you don't have an account.
         </p>
       </div>
-    )}
-  </div>
-);
+    );
+  }
+
+  if (!isEmpty(invitation)) {
+    return (
+      <div>
+        <h4>Register New Account</h4>
+        <NewCredentialsForm />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h4>Register New Account</h4>
+
+      {loading ? (
+        <p>Loading</p>
+      ) : (
+        <NewUserForm
+          onSubmit={values => registrationHandler(
+            values.email, 
+            values.firstName, 
+            values.lastName, 
+            values.username,
+          )}
+        />
+      )}
+      
+      <p onClick={() => changeRegisterNew(false)}>
+        Click here if you already have an account.
+      </p>
+    </div>
+  );
+};
+
 
 NewUser.defaultProps = {
   loading: false,
@@ -49,6 +70,7 @@ NewUser.defaultProps = {
 NewUser.PropTypes = {
   changeRegisterNew: PropTypes.func.isRequired,
   loading: PropTypes.bool,
+  invitation: PropTypes.shape({}).isRequired,
   registerNew: PropTypes.bool.isRequired,
   registrationHandler: PropTypes.bool.isRequired,
 };
