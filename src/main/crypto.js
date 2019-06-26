@@ -106,7 +106,7 @@ export const generateSecretKey = () => {
 
   const allSet = intSet.concat(charSet, charSet2, charSet3);
   let key = '';
-  for (var i; i < 32; i++) {
+  for (var i = 0; i < 32; i++) {
     const randElem = allSet[Math.floor(Math.random() * allSet.length)];
     key = key.concat(randElem);
   }
