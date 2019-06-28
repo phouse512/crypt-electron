@@ -8,7 +8,7 @@
     "build:renderer": "webpack --config webpack-renderer.config.js",
     "build:main:watch": "webpack --config webpack-main.config.js --watch",
     "build:renderer:watch": "webpack --config webpack-renderer.config.js --watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --require babel-core/register 'src/**/*.test.js'",
     "start": "electron ."
   },
   "keywords": [
@@ -25,14 +25,17 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
+    "chai": "^4.2.0",
     "devtron": "^1.4.0",
     "electron": "^5.0.2",
     "electron-devtools-installer": "^2.2.4",
+    "mocha": "^6.1.4",
     "precss": "^4.0.0",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2"
   },
   "dependencies": {
+    "babel-register": "^6.26.0",
     "bigint-buffer": "^1.1.2",
     "buffer-xor": "^2.0.2",
     "electron-better-ipc": "^0.3.0",
