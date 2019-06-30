@@ -5,6 +5,7 @@ import {
   generateSalt, 
   generateSecretKey,
 } from './crypto';
+import { join } from 'path';
 
 /*
  * IPC handler for generating credentials.
@@ -65,15 +66,18 @@ export const generateCredentials = (data) => {
     // encrypt private with muk
     const iv = Buffer.alloc(16);
     crypto.randomFillSync(iv, 0);
+    console.log(iv);
     const cipher = crypto.createCipheriv('aes-256-gcm', mukObj.mukObj.k, iv);
-    let encryptedPrivateKey = cipher.update(privateKey, 'binary', 'base64');
-    encryptedPrivateKey += cipher.final('base64');
-    console.log(encryptedPrivateKey);
+    const encryptedPrivateKey = Buffer.concat([cipher.update(privateKey), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+    console.log(encryptedPrivateKey)
+
 
     const decipher = crypto.createDecipheriv('aes-256-gcm', mukObj.mukObj.k, iv);
-    let decrypted = decipher.update(encryptedPrivateKey, 'base64', 'hex');
-    decrypted += decipher.final('hex')
-    console.log(decrypted);
+    decipher.setAuthTag(authTag);
+    let decrypted = Buffer.concat([decipher.update(encryptedPrivateKey), decipher.final()]);
+    console.log(decrypted.toString('utf8'))
+
 
     // generate srp salt, verifier
 
