@@ -38,7 +38,7 @@
     "babel-register": "^6.26.0",
     "bigint-buffer": "^1.1.2",
     "buffer-xor": "^2.0.2",
-    "electron-better-ipc": "^0.3.0",
+    "electron-better-ipc": "0.2.0",
     "futoin-hkdf": "^1.0.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

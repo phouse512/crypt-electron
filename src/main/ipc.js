@@ -3,7 +3,12 @@ const {ipcMain: ipc} = require('electron-better-ipc');
 import fs from 'fs';
 
 import userConfig from '../constants/storage';
-import { derivePrivateKeys } from './crypto';
+import { 
+  derivePrivateKeys,
+  generateSalt, 
+  generateSecretKey,
+} from './crypto';
+import { generateCredentials } from './ipcHandler';
 
 ipc.answerRenderer('check-existing-user', async data => {
   // import credentials file
@@ -70,6 +75,15 @@ ipc.answerRenderer('unlock-user-credentials', async data => {
       data: {},
     };
   }
-})
+});
+
+ipc.answerRenderer('generate-credentials', async data => {
+  return generateCredentials(data);
+});
+
+
+ipc.answerRenderer('store-local-config', async data => {
+  console.log('attempting to store yo');
+});
 
 

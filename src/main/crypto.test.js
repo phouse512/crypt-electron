@@ -1,5 +1,5 @@
 import { generateSalt, generateSecretKey } from './crypto';
-import { assert }from 'chai';
+import { assert } from 'chai';
 
 describe('Crypto methods', () => {
   describe('generateSalt', () => {
