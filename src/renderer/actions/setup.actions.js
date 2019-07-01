@@ -13,6 +13,11 @@ export const invitationRequest = ({ email, firstName, lastName, username }) => (
   username,
 });
 
+export const generateCredentials = ({ masterPass }) => ({
+  type: setupConstants.CREATE_CREDENTIALS,
+  masterPass,
+});
+
 export const setInvitation = ({ accountId, firstName, lastName, uuid }) => ({
   type: setupConstants.SET_INVITATION,
   accountId,

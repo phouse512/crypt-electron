@@ -2,6 +2,7 @@ const { app } = require('electron');
 const {ipcMain: ipc} = require('electron-better-ipc');
 import fs from 'fs';
 
+import ipcConstants from '../constants/ipc';
 import userConfig from '../constants/storage';
 import { 
   derivePrivateKeys,
@@ -10,7 +11,7 @@ import {
 } from './crypto';
 import { generateCredentials } from './ipcHandler';
 
-ipc.answerRenderer('check-existing-user', async data => {
+ipc.answerRenderer(ipcConstants.CHECK_EXISTING_USER, async data => {
   // import credentials file
   const userConfigPath = `${app.getPath('userData')}/${userConfig.USER_CONFIG_FILE}`;
   try {
@@ -44,7 +45,7 @@ ipc.answerRenderer('check-existing-user', async data => {
   }
 });
 
-ipc.answerRenderer('unlock-user-credentials', async data => {
+ipc.answerRenderer(ipcConstants.UNLOCK_USER_CREDENTIALS, async data => {
   try {
     // verify that all correct data is there
     const accountId = data.accountId;
@@ -77,13 +78,11 @@ ipc.answerRenderer('unlock-user-credentials', async data => {
   }
 });
 
-ipc.answerRenderer('generate-credentials', async data => {
-  return generateCredentials(data);
+ipc.answerRenderer(ipcConstants.GENERATE_CREDENTIALS, async data => {
+  const userConfigPath = `${app.getPath('userData')}/${userConfig.USER_CONFIG_FILE}`;
+  return generateCredentials(data, userConfigPath);
 });
 
-
-ipc.answerRenderer('store-local-config', async data => {
+ipc.answerRenderer(ipcConstants.STORE_LOCAL_CONFIG, async data => {
   console.log('attempting to store yo');
 });
-
-

@@ -8,7 +8,8 @@ describe('IPC handlers', () => {
         accountId: 31,
         email: 'phouse512@gmail.com',
         masterPass: 'himynameisphil',
-      });
+      }, 'fake_path.json');
+      console.log(result);
     })
   });
 })

@@ -11,6 +11,7 @@ import {
 } from '../actions/auth.actions';
 import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
 import { invitationRequest } from '../api/invitation';
+import ipcConstants from '../../constants/ipc';
 
 const getLocalData = (state) => state.login.localUserData;
 
@@ -20,7 +21,7 @@ export function* sayHello() {
 
 function* checkExistingUser() {
   console.log('checking existing user.');
-  const resp = yield ipc.callMain('check-existing-user', 'TESTUSER');
+  const resp = yield ipc.callMain(ipcConstants.CHECK_EXISTING_USER, 'TESTUSER');
   console.log(resp);
   if (resp.error) {
     console.error('Received error from ipc main');
@@ -52,7 +53,7 @@ function* unlockUserCredentials(action) {
  
   // compute promotional
   try {
-    const resp = yield ipc.callMain('unlock-user-credentials', credData);
+    const resp = yield ipc.callMain(ipcConstants.UNLOCK_USER_CREDENTIALS, credData);
     console.log(resp);
   // store data
   } catch (error) {
@@ -82,6 +83,8 @@ function* createInvitationRequest(action) {
 function* setMasterPass(action) {
   try {
     yield put(setLoadingFlag(true));
+
+    console.log(action);
     // get new salt
     // get new secret key
     // derive private keys
@@ -106,6 +109,10 @@ export function* watchCheckExisting() {
 
 export function* watchCreateInvitation() {
   yield takeLatest(setupConstants.CREATE_INVITATION_REQUEST, createInvitationRequest);
+}
+
+export function* watchCreateCredentials() {
+  yield takeLatest(setupConstants.CREATE_CREDENTIALS, setMasterPass);
 }
 
 export function* watchLogin() {
