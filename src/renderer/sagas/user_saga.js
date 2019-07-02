@@ -14,6 +14,7 @@ import { invitationRequest } from '../api/invitation';
 import ipcConstants from '../../constants/ipc';
 
 const getLocalData = (state) => state.login.localUserData;
+const getInvitationData = (state) => state.setup.invitation;
 
 export function* sayHello() {
   console.log('HELLO');

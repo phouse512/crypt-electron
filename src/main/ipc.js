@@ -1,6 +1,9 @@
 const { app } = require('electron');
-const {ipcMain: ipc} = require('electron-better-ipc');
+// const {ipcMain: ipc} = require('electron-better-ipc');
+const ipc = require('electron-better-ipc');
 import fs from 'fs';
+
+console.log(ipc);
 
 import ipcConstants from '../constants/ipc';
 import userConfig from '../constants/storage';
