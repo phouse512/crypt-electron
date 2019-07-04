@@ -102,6 +102,11 @@ function* setMasterPass(action) {
 
     console.log(credentials);
 
+    const writeResult = yield ipc.callMain(ipcConstants.STORE_LOCAL_CONFIG, {
+      localConfigData: credentials.data.localConfigData,
+    });
+    console.log('write result: ', writeResult);
+
 
     // get new salt
     // get new secret key

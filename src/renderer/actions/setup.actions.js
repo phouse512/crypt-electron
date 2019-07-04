@@ -18,11 +18,20 @@ export const generateCredentials = ({ masterPass }) => ({
   masterPass,
 });
 
-export const setInvitation = ({ accountId, firstName, lastName, uuid }) => ({
-  type: setupConstants.SET_INVITATION,
+export const setInvitation = ({ 
   accountId,
+  email,
   firstName,
   lastName,
+  username,
+  uuid, 
+}) => ({
+  type: setupConstants.SET_INVITATION,
+  accountId,
+  email,
+  firstName,
+  lastName,
+  username,
   uuid,
 });
 

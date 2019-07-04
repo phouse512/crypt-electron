@@ -82,10 +82,23 @@ ipc.answerRenderer(ipcConstants.UNLOCK_USER_CREDENTIALS, async data => {
 });
 
 ipc.answerRenderer(ipcConstants.GENERATE_CREDENTIALS, async data => {
-  const userConfigPath = `${app.getPath('userData')}/${userConfig.USER_CONFIG_FILE}`;
-  return generateCredentials(data, userConfigPath);
+  return generateCredentials(data);
 });
 
 ipc.answerRenderer(ipcConstants.STORE_LOCAL_CONFIG, async data => {
-  console.log('attempting to store yo');
+  try {
+    // write local to json
+    const userConfigPath = `${app.getPath('userData')}/${userConfig.USER_CONFIG_FILE}`;
+    fs.writeFileSync(userConfigPath, JSON.stringify(data.localConfigData));
+    return {
+      error: false,
+      data: {},
+    };
+  } catch (err) {
+    console.error('Unable to write config to disk.', err);
+    return {
+      error: true,
+      data: {},
+    };
+  }
 });

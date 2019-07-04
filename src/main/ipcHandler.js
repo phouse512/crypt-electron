@@ -13,7 +13,7 @@ import { fstat } from 'fs';
  * IPC handler for generating credentials.
  * @param: data
  */
-export const generateCredentials = (data, userConfigPath) => {
+export const generateCredentials = (data) => {
   try {
     // assert object
 
@@ -120,9 +120,6 @@ export const generateCredentials = (data, userConfigPath) => {
         serverData,
       },
     };
-
-    // write local to json
-    fs.writeFileSync(userConfigPath, JSON.stringify(localConfigData));
 
     return {
       error: false,
