@@ -1,5 +1,6 @@
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
-const { ipcRenderer: ipc } = require('electron-better-ipc');
+// const { ipcRenderer: ipc } = require('electron-better-ipc');
+const ipc = require('electron-better-ipc');
 import {
   authConstants,
   setupConstants,
@@ -71,8 +72,10 @@ function* createInvitationRequest(action) {
     })
     yield put(setInvitation({
       accountId: result.data.account_id,
+      email: action.email,
       firstName: action.firstName,
       lastName: action.lastName,
+      username: action.username,
       uuid: result.data.uuid,
     }));
     yield put(setLoadingFlag(false));
@@ -84,8 +87,22 @@ function* createInvitationRequest(action) {
 function* setMasterPass(action) {
   try {
     yield put(setLoadingFlag(true));
-
+    // get all existing invitation data
+    const invitationData = yield select(getInvitationData);
+    console.log(invitationData);
     console.log(action);
+
+
+    // get credentials from call
+    const credentials = yield ipc.callMain(ipcConstants.GENERATE_CREDENTIALS, {
+      accountId: invitationData.accountId,
+      email: invitationData.email,
+      masterPass: action.masterPass,
+    });
+
+    console.log(credentials);
+
+
     // get new salt
     // get new secret key
     // derive private keys
