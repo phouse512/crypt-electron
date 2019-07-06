@@ -1,9 +1,30 @@
+const assert = require('assert').strict;
 const crypto = require('crypto');
 const hkdf = require('futoin-hkdf');
 const xor = require('buffer-xor');
 const bigint = require('bigint-buffer');
 
 const VERSION = 'crypt-0.01';
+
+export const getSrpX = (params, salt, I, P) => {
+  // ASSERT salt, I, P are all buffers
+  assert.strictEqual(true, Buffer.isBuffer(salt));
+  assert.strictEqual(true, Buffer.isBuffer(I));
+  assert.strictEqual(true, Buffer.isBuffer(P));
+
+  // = H(I | ":" | P))
+  var hashIP = crypto.createHash(params.hash)
+    .update(Buffer.concat([I, new Buffer(':'), P]))
+    .digest();
+  
+  // = H(s | H(I | ":" | P))
+  var hashX = crypto.createHash(params.hash)
+    .update(salt)
+    .update(hashIP)
+    .digest();
+  
+  return bigint.toBigIntLE(hashX);
+}
 
 export const derivePrivateKeys = ({
   accountId,
