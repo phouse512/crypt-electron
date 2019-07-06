@@ -1,6 +1,11 @@
 import { assert, expect } from 'chai';
 
-import { generateSalt, generateSecretKey, getSrpX } from './crypto';
+import {
+  computeVerifier,
+  generateSalt,
+  generateSecretKey,
+  getSrpX,
+} from './crypto';
 import params from './srpParams';
 import { AssertionError } from 'assert';
 
@@ -66,5 +71,12 @@ describe('Crypto methods', () => {
         assert.strictEqual(firstRun, getSrpX(params['2048'], fakeSalt, fakeEmail, fakePw));
       }
     });
+  });
+
+  describe('computeVerifier', () => {
+    const fakeEmail = Buffer.from('phouse512@gmail.com');
+    const fakePw = Buffer.from('hello');
+    const fakeSalt = Buffer.from('fakeSalt');
+    const v = computeVerifier(params['2048'], fakeSalt, fakeEmail, fakePw);
   });
 });

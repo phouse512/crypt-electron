@@ -3,6 +3,9 @@ const crypto = require('crypto');
 const hkdf = require('futoin-hkdf');
 const xor = require('buffer-xor');
 const bigint = require('bigint-buffer');
+const bigInt = require('big-integer');
+
+import params from './srpParams';
 
 const VERSION = 'crypt-0.01';
 
@@ -24,6 +27,20 @@ export const getSrpX = (params, salt, I, P) => {
     .digest();
   
   return bigint.toBigIntLE(hashX);
+};
+
+export const computeVerifier = (params, salt, I, P) => {
+  // ASSERT salt, I, P are all buffers
+  assert.strictEqual(true, Buffer.isBuffer(salt));
+  assert.strictEqual(true, Buffer.isBuffer(I));
+  assert.strictEqual(true, Buffer.isBuffer(P));
+
+  // v = g % N
+  const x = getSrpX(params, salt, I, P);
+  const v = bigInt(params.g).modPow(x, params.N);
+
+  // returns hex representation of bigint
+  return v.toString('16');
 }
 
 export const derivePrivateKeys = ({
@@ -100,9 +117,9 @@ export const derivePrivateKeys = ({
   // srp: kap xor srp km
   const xoredSrp = xor(srpKa, hashedSrp);
 
-  console.log('xoredMuk: ', xoredMuk.toString('base64'));
-  console.log('xoredSrp: ', xoredSrp.toString('base64'));
-  console.log('bigint: ', bigint.toBigIntBE(xoredSrp));
+  // console.log('xoredMuk: ', xoredMuk.toString('base64'));
+  // console.log('xoredSrp: ', xoredSrp.toString('base64'));
+  // console.log('bigint: ', bigint.toBigIntBE(xoredSrp));
   return {
     mukObj: {
       alg: 'A256GCM',
@@ -113,8 +130,19 @@ export const derivePrivateKeys = ({
       kid: 'mp',
     },
     srpObj: {
-      srpx: xoredSrp,
       salt: srpSalt,
+      srpv: computeVerifier(
+        params['2048'],
+        salt,
+        Buffer.from(email, 'utf8'),
+        xoredSrp,
+      ),
+      srpx: getSrpX(
+        params['2048'],
+        salt,
+        Buffer.from(email, 'utf8'),
+        xoredSrp,
+      ),
     },
   };
 };

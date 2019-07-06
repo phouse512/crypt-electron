@@ -121,12 +121,18 @@ export const generateCredentials = (data) => {
       },
     };
 
+    const serverSrpData = {
+      salt: srpData.salt,
+      v: mukObj.srpObj.srpv,
+    };
+
     return {
       error: false,
       data: {
         localConfigData,
         localEphemeralData,
         serverData,
+        serverSrpData,
       },
     };
   } catch (err) {

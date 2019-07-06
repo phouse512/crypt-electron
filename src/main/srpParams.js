@@ -1,7 +1,7 @@
 const bigint = require('bigint-buffer');
 
 export const hexToBigInt = (hexString) => (
-  bigint.toBigIntLE(Buffer.from(hexString, 'hex'))
+  bigint.toBigIntBE(Buffer.from(hexString.replace(/\s/g,''), 'hex'))
 );
 
 const params = {

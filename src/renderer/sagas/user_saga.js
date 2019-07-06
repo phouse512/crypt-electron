@@ -11,7 +11,7 @@ import {
   userLogin,
 } from '../actions/auth.actions';
 import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
-import { invitationRequest } from '../api/invitation';
+import { invitationRequest, registrationRequest } from '../api/invitation';
 import ipcConstants from '../../constants/ipc';
 
 const getLocalData = (state) => state.login.localUserData;
@@ -92,7 +92,6 @@ function* setMasterPass(action) {
     console.log(invitationData);
     console.log(action);
 
-
     // get credentials from call
     const credentials = yield ipc.callMain(ipcConstants.GENERATE_CREDENTIALS, {
       accountId: invitationData.accountId,
@@ -102,25 +101,26 @@ function* setMasterPass(action) {
 
     console.log(credentials);
 
+    // write to local
     const writeResult = yield ipc.callMain(ipcConstants.STORE_LOCAL_CONFIG, {
       localConfigData: credentials.data.localConfigData,
     });
     console.log('write result: ', writeResult);
 
+    // get device id
 
-    // get new salt
-    // get new secret key
-    // derive private keys
-
-    // generate public/private keypair
-
-    // generate symmetric 
-
-    // generate srpx 
-
-    // upload keyset to server
-
-    // generate file 
+    // send to public server
+    const result = yield registrationRequest({
+      deviceAgent: '',
+      deviceOs: 'deviceOs',
+      deviceUuid: '',
+      firstName: invitationData.firstName,
+      invitationUuid: invitationData.uuid,
+      lastName: invitationData.lastName,
+      publicKeyset: JSON.stringify(credentials.data.serverData),
+      srpAuthSalt: credentials.data.serverSrpData.salt.toString('base64'),
+      srpVerifier: Buffer.from(credentials.data.serverSrpData.v, 'hex').toString('base64'),
+    });
   } catch (error) {
     console.error(error);
   }
