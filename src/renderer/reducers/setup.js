@@ -17,8 +17,10 @@ const setup = (state = baseState, action) => {
         invitation: {
           ...state.invitation,
           accountId: action.accountId,
+          email: action.email,
           firstName: action.firstName,
           lastName: action.lastName,
+          username: action.username,
           uuid: action.uuid,
         },
       });

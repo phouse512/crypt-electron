@@ -1,11 +1,20 @@
 const { app } = require('electron');
-const {ipcMain: ipc} = require('electron-better-ipc');
+// const {ipcMain: ipc} = require('electron-better-ipc');
+const ipc = require('electron-better-ipc');
 import fs from 'fs';
 
-import userConfig from '../constants/storage';
-import { derivePrivateKeys } from './crypto';
+console.log(ipc);
 
-ipc.answerRenderer('check-existing-user', async data => {
+import ipcConstants from '../constants/ipc';
+import userConfig from '../constants/storage';
+import { 
+  derivePrivateKeys,
+  generateSalt, 
+  generateSecretKey,
+} from './crypto';
+import { generateCredentials } from './ipcHandler';
+
+ipc.answerRenderer(ipcConstants.CHECK_EXISTING_USER, async data => {
   // import credentials file
   const userConfigPath = `${app.getPath('userData')}/${userConfig.USER_CONFIG_FILE}`;
   try {
@@ -39,7 +48,7 @@ ipc.answerRenderer('check-existing-user', async data => {
   }
 });
 
-ipc.answerRenderer('unlock-user-credentials', async data => {
+ipc.answerRenderer(ipcConstants.UNLOCK_USER_CREDENTIALS, async data => {
   try {
     // verify that all correct data is there
     const accountId = data.accountId;
@@ -70,6 +79,26 @@ ipc.answerRenderer('unlock-user-credentials', async data => {
       data: {},
     };
   }
-})
+});
 
+ipc.answerRenderer(ipcConstants.GENERATE_CREDENTIALS, async data => {
+  return generateCredentials(data);
+});
 
+ipc.answerRenderer(ipcConstants.STORE_LOCAL_CONFIG, async data => {
+  try {
+    // write local to json
+    const userConfigPath = `${app.getPath('userData')}/${userConfig.USER_CONFIG_FILE}`;
+    fs.writeFileSync(userConfigPath, JSON.stringify(data.localConfigData));
+    return {
+      error: false,
+      data: {},
+    };
+  } catch (err) {
+    console.error('Unable to write config to disk.', err);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});

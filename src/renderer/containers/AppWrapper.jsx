@@ -5,7 +5,11 @@ import { connect } from 'react-redux';
 import 'whatwg-fetch';
 
 import { checkUserLogin, unlockAccount } from '../actions/auth.actions';
-import { changeNewUser, invitationRequest } from '../actions/setup.actions';
+import { 
+  changeNewUser,
+  generateCredentials, 
+  invitationRequest,
+} from '../actions/setup.actions';
 import { isEmpty } from '../../util/object';
 
 import MasterPassForm from '../components/forms/MasterPassForm';
@@ -25,6 +29,7 @@ export class AppWrapperComponent extends React.Component {
           Welcome!
           <NewUser
             changeRegisterNew={this.props.changeRegisterNew}
+            generateCreds={this.props.generateCreds}
             loading={this.props.setup.loading}
             invitation={this.props.setup.invitation}
             registerNew={this.props.registerNew}
@@ -68,6 +73,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = dispatch => ({
   changeRegisterNew: (change) => dispatch(changeNewUser(change)),
   checkExistingUser: () => dispatch(checkUserLogin()),
+  generateCreds: (masterPass) => dispatch(generateCredentials({ masterPass })),
   registrationHandler: (email, firstName, lastName, username) => dispatch(
     invitationRequest({ email, firstName, lastName, username })),
   unlockAccount: (masterPass) => dispatch(unlockAccount({ masterPass })),

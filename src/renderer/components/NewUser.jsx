@@ -10,6 +10,7 @@ const isEmpty = (object) => (
 
 const NewUser = ({
   changeRegisterNew,
+  generateCreds,
   loading,
   invitation,
   registerNew,
@@ -33,7 +34,11 @@ const NewUser = ({
     return (
       <div>
         <h4>Register New Account</h4>
-        <NewCredentialsForm />
+        <NewCredentialsForm
+          onSubmit={values => generateCreds(
+            values.masterPassOne,
+          )}
+        />
       </div>
     );
   }
@@ -69,6 +74,7 @@ NewUser.defaultProps = {
 
 NewUser.PropTypes = {
   changeRegisterNew: PropTypes.func.isRequired,
+  generateCreds: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   invitation: PropTypes.shape({}).isRequired,
   registerNew: PropTypes.bool.isRequired,

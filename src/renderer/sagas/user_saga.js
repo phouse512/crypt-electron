@@ -1,5 +1,6 @@
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
-const { ipcRenderer: ipc } = require('electron-better-ipc');
+// const { ipcRenderer: ipc } = require('electron-better-ipc');
+const ipc = require('electron-better-ipc');
 import {
   authConstants,
   setupConstants,
@@ -10,9 +11,11 @@ import {
   userLogin,
 } from '../actions/auth.actions';
 import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
-import { invitationRequest } from '../api/invitation';
+import { invitationRequest, registrationRequest } from '../api/invitation';
+import ipcConstants from '../../constants/ipc';
 
 const getLocalData = (state) => state.login.localUserData;
+const getInvitationData = (state) => state.setup.invitation;
 
 export function* sayHello() {
   console.log('HELLO');
@@ -20,7 +23,7 @@ export function* sayHello() {
 
 function* checkExistingUser() {
   console.log('checking existing user.');
-  const resp = yield ipc.callMain('check-existing-user', 'TESTUSER');
+  const resp = yield ipc.callMain(ipcConstants.CHECK_EXISTING_USER, 'TESTUSER');
   console.log(resp);
   if (resp.error) {
     console.error('Received error from ipc main');
@@ -52,7 +55,7 @@ function* unlockUserCredentials(action) {
  
   // compute promotional
   try {
-    const resp = yield ipc.callMain('unlock-user-credentials', credData);
+    const resp = yield ipc.callMain(ipcConstants.UNLOCK_USER_CREDENTIALS, credData);
     console.log(resp);
   // store data
   } catch (error) {
@@ -69,8 +72,10 @@ function* createInvitationRequest(action) {
     })
     yield put(setInvitation({
       accountId: result.data.account_id,
+      email: action.email,
       firstName: action.firstName,
       lastName: action.lastName,
+      username: action.username,
       uuid: result.data.uuid,
     }));
     yield put(setLoadingFlag(false));
@@ -82,19 +87,41 @@ function* createInvitationRequest(action) {
 function* setMasterPass(action) {
   try {
     yield put(setLoadingFlag(true));
-    // get new salt
-    // get new secret key
-    // derive private keys
+    // get all existing invitation data
+    const invitationData = yield select(getInvitationData);
+    console.log(invitationData);
+    console.log(action);
 
-    // generate public/private keypair
+    // get credentials from call
+    const credentials = yield ipc.callMain(ipcConstants.GENERATE_CREDENTIALS, {
+      accountId: invitationData.accountId,
+      email: invitationData.email,
+      masterPass: action.masterPass,
+    });
 
-    // generate symmetric 
+    console.log(credentials);
 
-    // generate srpx 
+    // write to local
+    const writeResult = yield ipc.callMain(ipcConstants.STORE_LOCAL_CONFIG, {
+      localConfigData: credentials.data.localConfigData,
+    });
+    console.log('write result: ', writeResult);
 
-    // upload keyset to server
+    // get device id
 
-    // generate file 
+    // send to public server
+    const result = yield registrationRequest({
+      deviceAgent: credentials.data.deviceData.agent,
+      deviceOs: credentials.data.deviceData.os,
+      deviceUuid: credentials.data.deviceData.uuid,
+      firstName: invitationData.firstName,
+      invitationUuid: invitationData.uuid,
+      lastName: invitationData.lastName,
+      publicKeyset: JSON.stringify(credentials.data.serverData),
+      srpAuthSalt: credentials.data.serverSrpData.salt.toString('base64'),
+      srpVerifier: Buffer.from(credentials.data.serverSrpData.v, 'hex').toString('base64'),
+      username: invitationData.username,
+    });
   } catch (error) {
     console.error(error);
   }
@@ -106,6 +133,10 @@ export function* watchCheckExisting() {
 
 export function* watchCreateInvitation() {
   yield takeLatest(setupConstants.CREATE_INVITATION_REQUEST, createInvitationRequest);
+}
+
+export function* watchCreateCredentials() {
+  yield takeLatest(setupConstants.CREATE_CREDENTIALS, setMasterPass);
 }
 
 export function* watchLogin() {

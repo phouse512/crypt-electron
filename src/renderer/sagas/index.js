@@ -1,5 +1,6 @@
 export { 
   watchCheckExisting,
+  watchCreateCredentials,
   watchCreateInvitation,
   watchLogin,
   watchUnlockAccount,
