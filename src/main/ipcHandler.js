@@ -1,5 +1,6 @@
 const crypto = require('crypto');
-import fs from 'fs';
+import os from 'os';
+import uuidv4 from 'uuid/v4';
 
 import { 
   derivePrivateKeys,
@@ -8,6 +9,8 @@ import {
 } from './crypto';
 import userConfig from '../constants/storage';
 import { fstat } from 'fs';
+
+const PUBLIC_EXPONENT = 65537;
 
 /*
  * IPC handler for generating credentials.
@@ -32,7 +35,7 @@ export const generateCredentials = (data) => {
 
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
       modulusLength: 2048,
-      publicExponent: 65537,
+      publicExponent: PUBLIC_EXPONENT,
       publicKeyEncoding: {
         type: 'spki',
         format: 'pem',
@@ -86,7 +89,7 @@ export const generateCredentials = (data) => {
 
     // return server obj
     const encPriKey = {
-      kid: 1,
+      kid: '',
       enc: 'A256GCM',
       cty: 'b5+jwk+json',
       data: encryptedPrivateKey.toString('base64'),
@@ -101,7 +104,12 @@ export const generateCredentials = (data) => {
       encPriKey,
       encSymKey,
       encryptedBy: 'mp',
-      pubKey: publicKey.toString('base64'),
+      pubKey: {
+        n: publicKey.toString('base64'),
+        kty: 'RSA',
+        kid: '',
+        e: Buffer.from(PUBLIC_EXPONENT.toString()).toString('base64'),
+      },
       uuid: '',
     };
 
@@ -126,9 +134,16 @@ export const generateCredentials = (data) => {
       v: mukObj.srpObj.srpv,
     };
 
+    const deviceData = {
+      agent: process.versions.electron,
+      os: os.type(),
+      uuid: uuidv4(),
+    };
+
     return {
       error: false,
       data: {
+        deviceData,
         localConfigData,
         localEphemeralData,
         serverData,

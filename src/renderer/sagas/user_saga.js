@@ -111,15 +111,16 @@ function* setMasterPass(action) {
 
     // send to public server
     const result = yield registrationRequest({
-      deviceAgent: '',
-      deviceOs: 'deviceOs',
-      deviceUuid: '',
+      deviceAgent: credentials.data.deviceData.agent,
+      deviceOs: credentials.data.deviceData.os,
+      deviceUuid: credentials.data.deviceData.uuid,
       firstName: invitationData.firstName,
       invitationUuid: invitationData.uuid,
       lastName: invitationData.lastName,
       publicKeyset: JSON.stringify(credentials.data.serverData),
       srpAuthSalt: credentials.data.serverSrpData.salt.toString('base64'),
       srpVerifier: Buffer.from(credentials.data.serverSrpData.v, 'hex').toString('base64'),
+      username: invitationData.username,
     });
   } catch (error) {
     console.error(error);

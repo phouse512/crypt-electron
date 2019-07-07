@@ -42,7 +42,7 @@ export const registrationRequest = ({
       first_name: firstName,
       invitation_uuid: invitationUuid,
       last_name: lastName,
-      keyset: publicKeyset,
+      keyset: Buffer.from(publicKeyset, 'utf8').toString('base64'),
       srp_auth_salt: srpAuthSalt,
       srp_verifier: srpVerifier,
       username: username,
