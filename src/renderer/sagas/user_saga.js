@@ -49,15 +49,21 @@ function* unlockUserCredentials(action) {
     accountId: localUserData.accountId,
     email: localUserData.email,
     masterPass: action.masterPass,
-    salt: localUserData.accountSalt,
+    salt: localUserData.salt,
     secretKey: localUserData.secretKey,
   };
+
+  const serverData = localUserData.cachedData.serverData;
  
   // compute promotional
   try {
-    const resp = yield ipc.callMain(ipcConstants.UNLOCK_USER_CREDENTIALS, credData);
-    console.log(resp);
-  // store data
+    const keyResp = yield ipc.callMain(ipcConstants.UNLOCK_USER_CREDENTIALS, {
+      credData,
+      serverData,
+    });
+    
+    console.log(keyResp);
+
   } catch (error) {
     console.log(error);
   }
@@ -89,8 +95,6 @@ function* setMasterPass(action) {
     yield put(setLoadingFlag(true));
     // get all existing invitation data
     const invitationData = yield select(getInvitationData);
-    console.log(invitationData);
-    console.log(action);
 
     // get credentials from call
     const credentials = yield ipc.callMain(ipcConstants.GENERATE_CREDENTIALS, {
@@ -99,15 +103,10 @@ function* setMasterPass(action) {
       masterPass: action.masterPass,
     });
 
-    console.log(credentials);
-
     // write to local
     const writeResult = yield ipc.callMain(ipcConstants.STORE_LOCAL_CONFIG, {
       localConfigData: credentials.data.localConfigData,
     });
-    console.log('write result: ', writeResult);
-
-    // get device id
 
     // send to public server
     const result = yield registrationRequest({

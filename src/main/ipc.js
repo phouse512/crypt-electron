@@ -7,7 +7,8 @@ console.log(ipc);
 
 import ipcConstants from '../constants/ipc';
 import userConfig from '../constants/storage';
-import { 
+import {
+  decrypt,
   derivePrivateKeys,
   generateSalt, 
   generateSecretKey,
@@ -51,10 +52,12 @@ ipc.answerRenderer(ipcConstants.CHECK_EXISTING_USER, async data => {
 ipc.answerRenderer(ipcConstants.UNLOCK_USER_CREDENTIALS, async data => {
   try {
     // verify that all correct data is there
-    const accountId = data.accountId;
-    console.log(data);
+    console.log(data.credData);
+    const params = Object.assign({}, data.credData, {
+      salt: Buffer.from(data.credData.salt, 'base64'),
+    });
 
-    const privateKeys = derivePrivateKeys(data);
+    const privateKeys = derivePrivateKeys(params);
     const encodedPrivateKeys = Object.assign({}, privateKeys, {
       mukObj: {
         ...privateKeys.mukObj,
@@ -66,16 +69,32 @@ ipc.answerRenderer(ipcConstants.UNLOCK_USER_CREDENTIALS, async data => {
         srpx: privateKeys.srpObj.srpx.toString('base64'),
       },
     });
-    console.log(typeof encodedPrivateKeys.srpObj.srpx);
-    console.log(encodedPrivateKeys);
-    return {
-      error: false,
-      data: encodedPrivateKeys,
-    };
+
+    // attempt to decrypt private keys
+    try {
+      const result = decrypt(
+        data.serverData.encPriKey.enc,
+        privateKeys.mukObj.k,
+        Buffer.from(data.serverData.encPriKey.data, 'base64'),
+      );
+      return {
+        error: false,
+        data: {},
+      }
+    } catch (error) {
+      console.log(error);
+      console.log('BAD MUK');
+      return {
+        error: true,
+        message: 'bad muk',
+        data: {},
+      };
+    }
   } catch (err) {
     console.error('Received error while unlocking: ', err);
     return {
       error: true,
+      message: 'unable to unlock',
       data: {},
     };
   }

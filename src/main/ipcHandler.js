@@ -2,13 +2,12 @@ const crypto = require('crypto');
 import os from 'os';
 import uuidv4 from 'uuid/v4';
 
-import { 
+import {
   derivePrivateKeys,
-  generateSalt, 
+  encrypt,
+  generateSalt,
   generateSecretKey,
 } from './crypto';
-import userConfig from '../constants/storage';
-import { fstat } from 'fs';
 
 const PUBLIC_EXPONENT = 65537;
 
@@ -63,14 +62,15 @@ export const generateCredentials = (data) => {
     // console.log(decryptedVaultKey);
 
     // encrypt private with muk
-    const iv = Buffer.alloc(16);
-    crypto.randomFillSync(iv, 0);
-    const cipher = crypto.createCipheriv('aes-256-gcm', mukObj.mukObj.k, iv);
-    const cipherText = Buffer.concat([cipher.update(privateKey), cipher.final()]);
-    const authTag = cipher.getAuthTag();
-    let bufferLength = Buffer.alloc(1);
-    bufferLength.writeUInt8(iv.length, 0)
-    const encryptedPrivateKey = Buffer.concat([bufferLength, iv, authTag, cipherText])
+    const encryptedPrivateKey = encrypt('A256GCM', mukObj.mukObj.k, Buffer.from(privateKey, 'utf8'));
+    // const iv = Buffer.alloc(16);
+    // crypto.randomFillSync(iv, 0);
+    // const cipher = crypto.createCipheriv('aes-256-gcm', mukObj.mukObj.k, iv);
+    // const cipherText = Buffer.concat([cipher.update(privateKey), cipher.final()]);
+    // const authTag = cipher.getAuthTag();
+    // let bufferLength = Buffer.alloc(1);
+    // bufferLength.writeUInt8(iv.length, 0)
+    // const encryptedPrivateKey = Buffer.concat([bufferLength, iv, authTag, cipherText])
 
     // SAMPLE DECRYPTION WITH MUK
     // const ivSize = encryptedPrivateKey.readUInt8(0)
