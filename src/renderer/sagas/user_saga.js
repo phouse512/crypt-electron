@@ -6,6 +6,7 @@ import {
   setupConstants,
 } from '../constants';
 import {
+  setKeyData,
   setNewUser,
   setUserLocalData,
   userLogin,
@@ -62,7 +63,15 @@ function* unlockUserCredentials(action) {
       serverData,
     });
     
-    console.log(keyResp);
+    // if successful, set isAuthed -> true, + muk + srp data
+    if (!keyResp.error) {
+      yield put(setKeyData({
+        mukObj: keyResp.data.mukObj,
+        srpObj: keyResp.data.srpObj,
+      }));
+    } else {
+      console.log('unable to authenticate successfully')
+    }
 
   } catch (error) {
     console.log(error);

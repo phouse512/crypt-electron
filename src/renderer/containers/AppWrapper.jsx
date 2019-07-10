@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Route, Switch } from 'react-router-dom';
+import { Route, HashRouter, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 import 'whatwg-fetch';
 
@@ -12,6 +12,7 @@ import {
 } from '../actions/setup.actions';
 import { isEmpty } from '../../util/object';
 
+import DashboardContainer from './DashboardContainer';
 import MasterPassForm from '../components/forms/MasterPassForm';
 import NewUser from '../components/NewUser';
 import { stat } from 'fs';
@@ -52,10 +53,9 @@ export class AppWrapperComponent extends React.Component {
     }
 
     return (
-      <div className="container-flex">
-
-        Welcome existing user!
-      </div>
+      <HashRouter>
+        <Route path="/" component={DashboardContainer} />
+      </HashRouter>
     );
   }
 }
