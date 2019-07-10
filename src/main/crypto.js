@@ -5,9 +5,94 @@ const xor = require('buffer-xor');
 const bigint = require('bigint-buffer');
 const bigInt = require('big-integer');
 
-import params from './srpParams';
+import params, { hexToBigInt } from './srpParams';
 
 const VERSION = 'crypt-0.01';
+
+/*
+ * Encrypt with AES-256-GCM.
+ * @param key: Buffer
+ * @param data: Buffer
+ * returns: Buffer
+ */
+const aes256gcmEncrypt = (key, data) => {
+  const iv = Buffer.alloc(16);
+  crypto.randomFillSync(iv, 0);
+  console.log('IV ENCRYPT')
+  console.log(iv.toString('base64'))
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const cipherText = Buffer.concat([cipher.update(data), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  console.log('AUTH TAG');
+  console.log(authTag.toString('base64'));
+  
+  // create byte that indicates IV length
+  let bufferLength = Buffer.alloc(1);
+  bufferLength.writeUInt8(iv.length, 0);
+
+  // concat IV length, IV, authTag, cipherText
+  return Buffer.concat([bufferLength, iv, authTag, cipherText]);
+};
+
+/*
+ * Generic encryption method that takes an algorithm. If unknown algorithm specified, returns an 
+      error. Returns a ciphertext as Buffer object
+ * @param alg: string
+ * @param key: Buffer
+ * @param data: Buffer
+ * returns: Buffer
+ */
+export const encrypt = (alg, key, data) => {
+  assert.strictEqual(true, Buffer.isBuffer(data));
+  assert.strictEqual(true, Buffer.isBuffer(key));
+
+  switch (alg) {
+    case 'A256GCM':
+      return aes256gcmEncrypt(key, data);
+    default:
+      throw new Error('Unknown algorithm type.');
+  }
+};
+
+/*
+ * Decrypt with AES-256-GCM.
+ * @param key: Buffer
+ * @param cipherText: Buffer
+ * returns: Buffer
+ */
+const aes256gcmDecrypt = (key, cipherText) => {
+  // read first byte to get IV size
+  const ivSize = cipherText.readUInt8(0);
+  const iv = cipherText.slice(1, ivSize + 1);
+  
+  // aes256 gcm auth tags are 16 bytes
+  const authTag = cipherText.slice(ivSize + 1, ivSize + 17);
+
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+  decipher.setAuthTag(authTag);
+
+  return Buffer.concat([decipher.update(cipherText.slice(ivSize + 17)), decipher.final()]);
+}
+
+/*
+ * Generic decryption method that takes an algorithm. If unknown algorithm specified, returns an 
+      error. Returns a decrypted Buffer
+ * @param alg: string
+ * @param key: Buffer
+ * @param ciphertext: Buffer
+ * returns: Buffer
+ */
+export const decrypt = (alg, key, cipherText) => {
+  assert.strictEqual(true, Buffer.isBuffer(cipherText));
+  assert.strictEqual(true, Buffer.isBuffer(key));
+
+  switch (alg) {
+    case 'A256GCM':
+      return aes256gcmDecrypt(key, cipherText);
+    default:
+      throw new Error('Unknown algorithm type.');
+  }
+};
 
 export const getSrpX = (params, salt, I, P) => {
   // ASSERT salt, I, P are all buffers
@@ -17,7 +102,7 @@ export const getSrpX = (params, salt, I, P) => {
 
   // = H(I | ":" | P))
   var hashIP = crypto.createHash(params.hash)
-    .update(Buffer.concat([I, new Buffer(':'), P]))
+    .update(Buffer.concat([I, Buffer.from(':'), P]))
     .digest();
   
   // = H(s | H(I | ":" | P))
@@ -26,7 +111,7 @@ export const getSrpX = (params, salt, I, P) => {
     .update(hashIP)
     .digest();
   
-  return bigint.toBigIntLE(hashX);
+  return bigint.toBigIntLE(hashX).toString('16');
 };
 
 export const computeVerifier = (params, salt, I, P) => {
@@ -36,7 +121,7 @@ export const computeVerifier = (params, salt, I, P) => {
   assert.strictEqual(true, Buffer.isBuffer(P));
 
   // v = g % N
-  const x = getSrpX(params, salt, I, P);
+  const x = hexToBigInt(getSrpX(params, salt, I, P));
   const v = bigInt(params.g).modPow(x, params.N);
 
   // returns hex representation of bigint

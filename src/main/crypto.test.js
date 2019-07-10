@@ -1,7 +1,10 @@
 import { assert, expect } from 'chai';
+import crypto from 'crypto';
 
 import {
   computeVerifier,
+  decrypt,
+  encrypt,
   generateSalt,
   generateSecretKey,
   getSrpX,
@@ -25,13 +28,13 @@ describe('Crypto methods', () => {
   });
 
   describe('getSrpX', () => {
-    it('should return a BigInt object.', () => {
+    it('should return a hex object.', () => {
       const fakeEmail = Buffer.from('phouse512@gmail.com')
       const fakePw = Buffer.from('hello');
       const fakeSalt = Buffer.from('fakeSalt');
 
       const result = getSrpX(params['2048'], fakeSalt, fakeEmail, fakePw);
-      assert.typeOf(result, 'bigint');
+      assert.typeOf(result, 'string');
     });
 
     it('should throw error when passed I as string', () => {
@@ -73,10 +76,36 @@ describe('Crypto methods', () => {
     });
   });
 
-  describe('computeVerifier', () => {
-    const fakeEmail = Buffer.from('phouse512@gmail.com');
-    const fakePw = Buffer.from('hello');
-    const fakeSalt = Buffer.from('fakeSalt');
-    const v = computeVerifier(params['2048'], fakeSalt, fakeEmail, fakePw);
+  // describe('computeVerifier', () => {
+  //   const fakeEmail = Buffer.from('phouse512@gmail.com');
+  //   const fakePw = Buffer.from('hello');
+  //   const fakeSalt = Buffer.from('fakeSalt');
+  //   const v = computeVerifier(params['2048'], fakeSalt, fakeEmail, fakePw);
+  // });
+
+  describe('encrypt', () => {
+    it('should encrypt aes256 gcm and decrypt with same key', () => {
+      const fakeKey = Buffer.alloc(32);
+      crypto.randomFillSync(fakeKey, 0);
+      const fakeData = Buffer.alloc(1024);
+      crypto.randomFillSync(fakeData, 0);
+
+      const encResult = encrypt('A256GCM', fakeKey, fakeData);
+      const decResult = decrypt('A256GCM', fakeKey, encResult);
+      assert.isTrue(fakeData.equals(decResult));
+    });
+
+    it('should throw an exception when wrong key used', () => {
+      const fakeKey = Buffer.alloc(32);
+      crypto.randomFillSync(fakeKey, 0);
+      const fakeData = Buffer.alloc(1024);
+      crypto.randomFillSync(fakeData, 0);
+
+      const encResult = encrypt('A256GCM', fakeKey, fakeData);
+      crypto.randomFillSync(fakeKey, 0);
+
+      const decryptCall = () => decrypt('A256GCM', fakeKey, encResult);
+      expect(decryptCall).to.throw(Error);
+    });
   });
 });
