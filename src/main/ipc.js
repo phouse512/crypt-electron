@@ -79,7 +79,7 @@ ipc.answerRenderer(ipcConstants.UNLOCK_USER_CREDENTIALS, async data => {
       );
       return {
         error: false,
-        data: {},
+        data: encodedPrivateKeys,
       }
     } catch (error) {
       console.log(error);

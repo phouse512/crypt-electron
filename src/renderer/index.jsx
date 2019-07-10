@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { applyMiddleware, compose, createStore} from 'redux';
 import { render } from 'react-dom';
-import { HashRouter, Route } from 'react-router-dom';
+import { HashRouter, Route, BrowserRouter } from 'react-router-dom';
 import createSagaMiddleware from 'redux-saga';
 
 import AppWrapper from './containers/AppWrapper';
@@ -25,11 +25,11 @@ const store = createStore(
 initSagas(sagaMiddleware);
 
 const App = () => (
-  <HashRouter>
+  <BrowserRouter>
     <div>
      <AppWrapper />
     </div>
-  </HashRouter>
+  </BrowserRouter>
 );
 
 render(
