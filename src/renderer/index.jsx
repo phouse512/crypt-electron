@@ -25,11 +25,7 @@ const store = createStore(
 initSagas(sagaMiddleware);
 
 const App = () => (
-  <BrowserRouter>
-    <div>
-     <AppWrapper />
-    </div>
-  </BrowserRouter>
+  <AppWrapper />
 );
 
 render(

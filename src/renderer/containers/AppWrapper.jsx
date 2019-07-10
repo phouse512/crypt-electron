@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Route, Router, Switch } from 'react-router-dom';
+import { Route, HashRouter, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 import 'whatwg-fetch';
 
@@ -53,9 +53,9 @@ export class AppWrapperComponent extends React.Component {
     }
 
     return (
-      <Router>
+      <HashRouter>
         <Route path="/" component={DashboardContainer} />
-      </Router>
+      </HashRouter>
     );
   }
 }
