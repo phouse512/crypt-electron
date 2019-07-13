@@ -36,3 +36,8 @@ export const unlockAccount = ({ masterPass }) => ({
 export const unsuccessfulAuth = () => ({
   type: authConstants.UNSUCCESSFUL_AUTH,
 });
+
+export const beginServerAuth = ({ email }) => ({
+  type: authConstants.BEGIN_SERVER_AUTH,
+  email,
+});

@@ -3,5 +3,6 @@ export {
   watchCreateCredentials,
   watchCreateInvitation,
   watchLogin,
+  watchServerAuth,
   watchUnlockAccount,
 } from './user_saga';

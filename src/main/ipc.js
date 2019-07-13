@@ -1,4 +1,5 @@
 const { app } = require('electron');
+const crypto = require('crypto');
 // const {ipcMain: ipc} = require('electron-better-ipc');
 const ipc = require('electron-better-ipc');
 import fs from 'fs';
@@ -13,6 +14,8 @@ import {
   generateSalt, 
   generateSecretKey,
 } from './crypto';
+import { genA } from './srp';
+import params from './srpParams'
 import { generateCredentials } from './ipcHandler';
 
 ipc.answerRenderer(ipcConstants.CHECK_EXISTING_USER, async data => {
@@ -115,6 +118,27 @@ ipc.answerRenderer(ipcConstants.STORE_LOCAL_CONFIG, async data => {
     };
   } catch (err) {
     console.error('Unable to write config to disk.', err);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});
+
+ipc.answerRenderer(ipcConstants.SRP_GET_A, async data => {
+  try {
+    const aBuf = Buffer.alloc(32);
+    crypto.randomFillSync(aBuf, 0, 32);
+
+    const aHex = genA(params['2048'], aBuf);
+    return {
+      error: false,
+      data: {
+        A: aHex,
+      },
+    };
+  } catch (err) {
+    console.error('Unable to get random A value.', err);
     return {
       error: true,
       data: {},

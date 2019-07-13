@@ -6,12 +6,14 @@ import {
   setupConstants,
 } from '../constants';
 import {
+  beginServerAuth,
   setKeyData,
   setNewUser,
   setUserLocalData,
   userLogin,
 } from '../actions/auth.actions';
 import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
+import { srpStepOne } from '../api/auth';
 import { invitationRequest, registrationRequest } from '../api/invitation';
 import ipcConstants from '../../constants/ipc';
 
@@ -69,6 +71,9 @@ function* unlockUserCredentials(action) {
         mukObj: keyResp.data.mukObj,
         srpObj: keyResp.data.srpObj,
       }));
+      
+      // try to server auth to get JWT
+      yield put(beginServerAuth({ email: localUserData.email }));
     } else {
       console.log('unable to authenticate successfully')
     }
@@ -135,6 +140,25 @@ function* setMasterPass(action) {
   }
 }
 
+function* serverAuth(action) {
+  try {
+    // get A
+    const resp = yield ipc.callMain(ipcConstants.SRP_GET_A);
+    console.log(resp);
+    // send A, I to server
+
+    console.log(action.email);
+
+    const result = yield(srpStepOne({
+      A: Buffer.from(resp.data.A, 'hex').toString('base64'),
+      I: action.email,
+    }))
+    console.log(result);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 export function* watchCheckExisting() {
   yield takeLatest(authConstants.CHECK_EXISTING_USER, checkExistingUser);
 }
@@ -153,4 +177,8 @@ export function* watchLogin() {
 
 export function* watchUnlockAccount() {
   yield takeEvery(authConstants.UNLOCK_ACCOUNT, unlockUserCredentials);
+}
+
+export function* watchServerAuth() {
+  yield takeEvery(authConstants.BEGIN_SERVER_AUTH, serverAuth);
 }
