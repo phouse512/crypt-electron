@@ -37,7 +37,8 @@ export const unsuccessfulAuth = () => ({
   type: authConstants.UNSUCCESSFUL_AUTH,
 });
 
-export const beginServerAuth = ({ email }) => ({
+export const beginServerAuth = ({ email, srpx }) => ({
   type: authConstants.BEGIN_SERVER_AUTH,
   email,
+  srpx,
 });

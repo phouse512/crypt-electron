@@ -73,7 +73,10 @@ function* unlockUserCredentials(action) {
       }));
       
       // try to server auth to get JWT
-      yield put(beginServerAuth({ email: localUserData.email }));
+      yield put(beginServerAuth({ 
+        email: localUserData.email,
+        srpx: keyResp.data.srpObj.srpx,
+      }));
     } else {
       console.log('unable to authenticate successfully')
     }
@@ -152,8 +155,15 @@ function* serverAuth(action) {
     const result = yield(srpStepOne({
       A: Buffer.from(resp.data.A, 'hex').toString('base64'),
       I: action.email,
-    }))
+    }));
     console.log(result);
+    const kResp = yield ipc.callMain(ipcConstants.SRP_GET_K, {
+      B: Buffer.from(result.data.B, 'base64').toString('hex'),
+      A: resp.data.A,
+      a: resp.data.a,
+      x: Buffer.from(action.srpx, 'base64').toString('hex'),
+    });
+    console.log(kResp);
   } catch (err) {
     console.error(err);
   }
