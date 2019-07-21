@@ -13,7 +13,7 @@ import {
   userLogin,
 } from '../actions/auth.actions';
 import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
-import { srpStepOne } from '../api/auth';
+import { srpStepOne, srpStepTwo } from '../api/auth';
 import { invitationRequest, registrationRequest } from '../api/invitation';
 import ipcConstants from '../../constants/ipc';
 
@@ -75,6 +75,7 @@ function* unlockUserCredentials(action) {
       // try to server auth to get JWT
       yield put(beginServerAuth({ 
         email: localUserData.email,
+        srpSalt: keyResp.data.srpObj.salt,
         srpx: keyResp.data.srpObj.srpx,
       }));
     } else {
@@ -157,13 +158,21 @@ function* serverAuth(action) {
       I: action.email,
     }));
     console.log(result);
-    const kResp = yield ipc.callMain(ipcConstants.SRP_GET_K, {
-      B: Buffer.from(result.data.B, 'base64').toString('hex'),
-      A: resp.data.A,
+    const kResp = yield ipc.callMain(ipcConstants.SRP_GET_M, {
       a: resp.data.a,
+      A: resp.data.A,
+      B: Buffer.from(result.data.B, 'base64').toString('hex'),
+      I: action.email,
+      s: action.srpSalt,
       x: Buffer.from(action.srpx, 'base64').toString('hex'),
     });
     console.log(kResp);
+
+    const stepTwoResult = yield(srpStepTwo({
+      I: action.email,
+      M: Buffer.from(kResp.data.M, 'hex').toString('base64'),
+    }));
+    console.log(stepTwoResult);
   } catch (err) {
     console.error(err);
   }

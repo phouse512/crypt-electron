@@ -14,7 +14,7 @@ import {
   generateSalt, 
   generateSecretKey,
 } from './crypto';
-import { genA, getk, getS, getu } from './srp';
+import { genA, getk, getK, getM, getS, getu } from './srp';
 import params from './srpParams'
 import { generateCredentials } from './ipcHandler';
 
@@ -147,7 +147,7 @@ ipc.answerRenderer(ipcConstants.SRP_GET_A, async data => {
   }
 });
 
-ipc.answerRenderer(ipcConstants.SRP_GET_K, async data => {
+ipc.answerRenderer(ipcConstants.SRP_GET_M, async data => {
   try {
     // data has A, B, a, x
     const A_buf = Buffer.from(data.A, 'hex');
@@ -156,12 +156,18 @@ ipc.answerRenderer(ipcConstants.SRP_GET_K, async data => {
     const x_buf = Buffer.from(data.x, 'hex');
     const k_buf = Buffer.from(getk(params['2048']), 'hex');
     const u_buf = Buffer.from(getu(params['2048'], A_buf, B_buf), 'hex');
+    const I_buf = Buffer.from(data.I);
+    const s_buf = Buffer.from(data.s, 'base64');
 
     const S = getS(params['2048'], k_buf, x_buf, a_buf, B_buf, u_buf);
-    console.log(S);
+    const K_buf = getK(params['2048'], S);
+
+    const M = getM(params['2048'], I_buf, s_buf, A_buf, B_buf, K_buf);
     return {
       error: false,
-      data: {},
+      data: {
+        M: M.toString('hex'),
+      },
     };
   } catch (err) {
     console.error('Unable to get K values: ', err);
