@@ -43,13 +43,35 @@ export const getu = (params, A, B) => {
  * @param params: srpParams.js object
  */
 export const getk = (params) => {
+  console.log(params.N);
+  console.log(params.g);
+  const totalLength = params.N_length_bits / 8;
+  const N_buf = bigint.toBufferBE(params.N, totalLength);
+  const g_buf = bigint.toBufferBE(params.g, 1);
+
+
+  // const paddedg_buf = Buffer.alloc(totalLength);
+  // paddedg_buf.fill(0, 0, padLength);
+  // g_buf.copy(paddedg_buf, padLength);
+  const paddedg_buf = g_buf;
   const kBuf = crypto.createHash(params.hash)
-    .update(bigint.toBufferBE(params.N))
-    .update(bigint.toBufferBE(params.g))
+    .update(N_buf)
+    .update(paddedg_buf)
     .digest();
 
   return kBuf.toString('hex');
 };
+
+/*
+ * euclideanModPow allows for a pow calculation that is consistent with other platforms.
+ * a: big-integer, base
+ * b: big-integer, power
+ * m: big-integer, mod
+ */
+const euclideanModPow = (a, b, m) => {
+  var x = bigInt(a).modPow(b, m);
+  return x.isNegative() ? x.add(m) : x;
+}
 
 /*
  * getS computes S from k, x, a, B, u.
@@ -73,10 +95,18 @@ export const getS = (params, k, x, a, B, u) => {
   if (zero.geq(B_num) || N.leq(B_num)) {
     throw new Error('Invalid server-computed B, must be 1..N-1');
   }
+  // console.log('a bitlength: ', a_num.bitLength());
+  // console.log('x num: ', x_num);
+  // console.log('a num: ', a_num)
+  // console.log('B Num: ', B_num)
+  // console.log('B bitlength: ', B_num.bitLength());
+  // console.log('k num: ', k_num);
+  // console.log('u num: ', u_num);
 
   const base = B_num.subtract(k_num.multiply(g.modPow(x_num, N)));
   const power = a_num.add(u_num.multiply(x_num));
-  const S_num = base.modPow(power, N).mod(N);
+  const S_num = euclideanModPow(base, power, N);
+  console.log('S num: ', S_num);
   return S_num.toString('16');
 };
 
@@ -107,11 +137,18 @@ export const getM = (params, I, s, A, B, K) => {
   assert.strictEqual(true, Buffer.isBuffer(K));
 
   // H(N) xor H(g) 
-  const g_buf = bigint.toBufferBE(params.g);
-  const N_buf = bigint.toBufferBE(params.N);
+  const g_buf = bigint.toBufferBE(params.g, 1);
+  console.log('g buf: ', g_buf.toString('base64'));
+  const N_buf = Buffer.from(params.N.toString(16), 'hex');
+  console.log('N buf: ', N_buf.toString('base64'));
+
   const H_g = crypto.createHash(params.hash).update(g_buf).digest();
+  console.log('H(g): ', H_g.toString('base64'));
   const H_N = crypto.createHash(params.hash).update(N_buf).digest();
+  console.log('H(N): ', H_N.toString('base64'));
   const N_xor_g = xorBuffer(H_N, H_g);
+
+  console.log('HNxorg: ', N_xor_g.toString('base64'))
 
   // H(^ | H(I) | s | A | B | K)
   const H_I = crypto.createHash(params.hash).update(I).digest();

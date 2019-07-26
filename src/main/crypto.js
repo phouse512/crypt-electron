@@ -110,8 +110,8 @@ export const getSrpX = (params, salt, I, P) => {
     .update(salt)
     .update(hashIP)
     .digest();
-  
-  return bigint.toBigIntLE(hashX).toString('16');
+  console.log('x: ', bigint.toBigIntBE(hashX).toString('16'));
+  return bigint.toBigIntBE(hashX).toString('16');
 };
 
 export const computeVerifier = (params, salt, I, P) => {

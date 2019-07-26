@@ -159,10 +159,21 @@ ipc.answerRenderer(ipcConstants.SRP_GET_M, async data => {
     const I_buf = Buffer.from(data.I);
     const s_buf = Buffer.from(data.s, 'base64');
 
+    console.log('s: ', data.s);
+    console.log('A: ', A_buf.toString('base64'));
+    console.log('a: ', a_buf.toString('base64'));
+    console.log('B: ', B_buf.toString('base64'));
+    console.log('x: ', x_buf.toString('base64'));
+
     const S = getS(params['2048'], k_buf, x_buf, a_buf, B_buf, u_buf);
+    console.log('')
+    console.log('u: ', u_buf.toString('base64'));
+    console.log('k: ', k_buf.toString('base64'));
     const K_buf = getK(params['2048'], S);
+    console.log('K: ', K_buf.toString('base64'))
 
     const M = getM(params['2048'], I_buf, s_buf, A_buf, B_buf, K_buf);
+    console.log('M: ', M.toString('base64'));
     return {
       error: false,
       data: {

@@ -164,7 +164,7 @@ function* serverAuth(action) {
       B: Buffer.from(result.data.B, 'base64').toString('hex'),
       I: action.email,
       s: action.srpSalt,
-      x: Buffer.from(action.srpx, 'base64').toString('hex'),
+      x: action.srpx,
     });
     console.log(kResp);
 
