@@ -43,3 +43,12 @@ export const beginServerAuth = ({ email, srpSalt, srpx }) => ({
   srpSalt,
   srpx,
 });
+
+export const serverAuthSuccess = ({ jwt }) => ({
+  type: authConstants.SUCCESSFUL_SERVER_AUTH,
+  jwt,
+});
+
+export const serverAuthFailure = ({}) => ({
+  type: authConstants.UNSUCCESSFUL_SERVER_AUTH,
+});

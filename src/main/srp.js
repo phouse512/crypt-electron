@@ -3,6 +3,8 @@ const bigint = require('bigint-buffer');
 const bigInt = require('big-integer');
 const crypto = require('crypto');
 
+import { hexToBigInt } from './srpParams';
+
 const zero = bigInt(0);
 
 /*
@@ -43,8 +45,6 @@ export const getu = (params, A, B) => {
  * @param params: srpParams.js object
  */
 export const getk = (params) => {
-  console.log(params.N);
-  console.log(params.g);
   const totalLength = params.N_length_bits / 8;
   const N_buf = bigint.toBufferBE(params.N, totalLength);
   const g_buf = bigint.toBufferBE(params.g, 1);
@@ -95,18 +95,10 @@ export const getS = (params, k, x, a, B, u) => {
   if (zero.geq(B_num) || N.leq(B_num)) {
     throw new Error('Invalid server-computed B, must be 1..N-1');
   }
-  // console.log('a bitlength: ', a_num.bitLength());
-  // console.log('x num: ', x_num);
-  // console.log('a num: ', a_num)
-  // console.log('B Num: ', B_num)
-  // console.log('B bitlength: ', B_num.bitLength());
-  // console.log('k num: ', k_num);
-  // console.log('u num: ', u_num);
 
   const base = B_num.subtract(k_num.multiply(g.modPow(x_num, N)));
   const power = a_num.add(u_num.multiply(x_num));
   const S_num = euclideanModPow(base, power, N);
-  console.log('S num: ', S_num);
   return S_num.toString('16');
 };
 
@@ -138,17 +130,11 @@ export const getM = (params, I, s, A, B, K) => {
 
   // H(N) xor H(g) 
   const g_buf = bigint.toBufferBE(params.g, 1);
-  console.log('g buf: ', g_buf.toString('base64'));
   const N_buf = Buffer.from(params.N.toString(16), 'hex');
-  console.log('N buf: ', N_buf.toString('base64'));
 
   const H_g = crypto.createHash(params.hash).update(g_buf).digest();
-  console.log('H(g): ', H_g.toString('base64'));
   const H_N = crypto.createHash(params.hash).update(N_buf).digest();
-  console.log('H(N): ', H_N.toString('base64'));
   const N_xor_g = xorBuffer(H_N, H_g);
-
-  console.log('HNxorg: ', N_xor_g.toString('base64'))
 
   // H(^ | H(I) | s | A | B | K)
   const H_I = crypto.createHash(params.hash).update(I).digest();
@@ -161,4 +147,50 @@ export const getM = (params, I, s, A, B, K) => {
     .update(K)
     .digest();
   return M;
+};
+
+export const getHAMK = (params, A_buf, M_buf, K_buf) => {
+  assert.strictEqual(true, Buffer.isBuffer(A_buf));
+  assert.strictEqual(true, Buffer.isBuffer(M_buf));
+  assert.strictEqual(true, Buffer.isBuffer(K_buf));
+  const H_AMK = crypto.createHash(params.hash)
+    .update(A_buf)
+    .update(M_buf)
+    .update(K_buf)
+    .digest();
+  return H_AMK;
+};
+
+export const computeVerifier = (params, salt, I, P) => {
+  // ASSERT salt, I, P are all buffers
+  assert.strictEqual(true, Buffer.isBuffer(salt));
+  assert.strictEqual(true, Buffer.isBuffer(I));
+  assert.strictEqual(true, Buffer.isBuffer(P));
+
+  // v = g % N
+  const x = hexToBigInt(getSrpX(params, salt, I, P));
+  const v = bigInt(params.g).modPow(x, params.N);
+
+  // returns hex representation of bigint
+  return v.toString('16');
+};
+
+export const getSrpX = (params, salt, I, P) => {
+  // ASSERT salt, I, P are all buffers
+  assert.strictEqual(true, Buffer.isBuffer(salt));
+  assert.strictEqual(true, Buffer.isBuffer(I));
+  assert.strictEqual(true, Buffer.isBuffer(P));
+
+  // = H(I | ":" | P))
+  var hashIP = crypto.createHash(params.hash)
+    .update(Buffer.concat([I, Buffer.from(':'), P]))
+    .digest();
+  
+  // = H(s | H(I | ":" | P))
+  var hashX = crypto.createHash(params.hash)
+    .update(salt)
+    .update(hashIP)
+    .digest();
+
+    return bigint.toBigIntBE(hashX).toString('16');
 };

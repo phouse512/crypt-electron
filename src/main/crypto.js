@@ -2,10 +2,9 @@ const assert = require('assert').strict;
 const crypto = require('crypto');
 const hkdf = require('futoin-hkdf');
 const xor = require('buffer-xor');
-const bigint = require('bigint-buffer');
-const bigInt = require('big-integer');
 
 import params, { hexToBigInt } from './srpParams';
+import { computeVerifier, getSrpX } from './srp';
 
 const VERSION = 'crypt-0.01';
 
@@ -72,7 +71,7 @@ const aes256gcmDecrypt = (key, cipherText) => {
   decipher.setAuthTag(authTag);
 
   return Buffer.concat([decipher.update(cipherText.slice(ivSize + 17)), decipher.final()]);
-}
+};
 
 /*
  * Generic decryption method that takes an algorithm. If unknown algorithm specified, returns an 
@@ -93,40 +92,6 @@ export const decrypt = (alg, key, cipherText) => {
       throw new Error('Unknown algorithm type.');
   }
 };
-
-export const getSrpX = (params, salt, I, P) => {
-  // ASSERT salt, I, P are all buffers
-  assert.strictEqual(true, Buffer.isBuffer(salt));
-  assert.strictEqual(true, Buffer.isBuffer(I));
-  assert.strictEqual(true, Buffer.isBuffer(P));
-
-  // = H(I | ":" | P))
-  var hashIP = crypto.createHash(params.hash)
-    .update(Buffer.concat([I, Buffer.from(':'), P]))
-    .digest();
-  
-  // = H(s | H(I | ":" | P))
-  var hashX = crypto.createHash(params.hash)
-    .update(salt)
-    .update(hashIP)
-    .digest();
-  console.log('x: ', bigint.toBigIntBE(hashX).toString('16'));
-  return bigint.toBigIntBE(hashX).toString('16');
-};
-
-export const computeVerifier = (params, salt, I, P) => {
-  // ASSERT salt, I, P are all buffers
-  assert.strictEqual(true, Buffer.isBuffer(salt));
-  assert.strictEqual(true, Buffer.isBuffer(I));
-  assert.strictEqual(true, Buffer.isBuffer(P));
-
-  // v = g % N
-  const x = hexToBigInt(getSrpX(params, salt, I, P));
-  const v = bigInt(params.g).modPow(x, params.N);
-
-  // returns hex representation of bigint
-  return v.toString('16');
-}
 
 export const derivePrivateKeys = ({
   accountId,
@@ -246,18 +211,10 @@ export const generateSecretKey = () => {
   }
 
   return key;
-}
+};
 
 export const generateSalt = () => {
   const buf = Buffer.alloc(16);
   crypto.randomFillSync(buf, 0, 16);
   return buf;
-}
-
-// derivePrivateKeys({
-//   accountId: 40, 
-//   email: '7@gmail.com',
-//   masterPass: 'hello_deer_pizzeria_valid',
-//   salt: 'ZHZCWIPMOZZVLNKY',
-//   secretKey: 'GGZYQ5RWJBXZMDC7NYNQYSQZWGRXJ3V3',
-// });
+};

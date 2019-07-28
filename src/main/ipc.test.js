@@ -9,7 +9,6 @@ describe('IPC handlers', () => {
         email: 'phouse512@gmail.com',
         masterPass: 'himynameisphil',
       }, 'fake_path.json');
-      console.log(result);
     })
   });
 })

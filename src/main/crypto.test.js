@@ -3,13 +3,12 @@ import crypto from 'crypto';
 const bigint = require('bigint-buffer');
 
 import {
-  computeVerifier,
   decrypt,
   encrypt,
   generateSalt,
   generateSecretKey,
-  getSrpX,
 } from './crypto';
+import { computeVerifier, getSrpX } from './srp';
 import params from './srpParams';
 import { AssertionError } from 'assert';
 
@@ -87,7 +86,7 @@ describe('Crypto methods', () => {
     const v_buf = Buffer.from(v, 'hex');
     const v_num = bigint.toBigIntBE(v_buf)
 
-    console.log('v: ', v_num);
+    // console.log('v: ', v_num);
   });
 
   describe('encrypt', () => {

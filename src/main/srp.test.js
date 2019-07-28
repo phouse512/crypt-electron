@@ -1,68 +1,133 @@
 import { assert } from 'chai';
-import crypto from 'crypto';
-const bigint = require('bigint-buffer');
 const bigInt = require('big-integer');
 
-import { genA, getk, getS } from './srp';
+import { genA, getHAMK, getk, getK, getM, getS, getu} from './srp';
 import params, { hexToBigInt } from './srpParams';
+
+const bigIntToBuffer = (num, width) => {
+  const hex = num.toString(16);
+  return Buffer.from(hex.padStart(width * 2, '0').slice(0, width * 2), 'hex');
+};
+
+const srpTestCases = [
+  {
+    B: '189262083140545621011029173565252992825161902861648496362848907250434626639347677891537815985676137224284268166784338264945112031597853565329097506663026883447823907025757364004756750139809610900860797117180439941012054132123330200714595424665762276709372813089917600850419153736186336599587502384042833427784072724643827742125465873452161677092653881802708905609891989523156821715104563686142321387155421476522531188389213060357788094335695267178974785310875290473761386542262679235203887581322265379034646645724671356724107541640585239324550053406702516132444052929649213406113148556155512251798936521051123961244',
+    k: '34704849670668482647683711281700631885066964767156528400561350050202374645357',
+    x: '96605723904677435393267606990100471890538533552084954682939862203822092241454',
+    a: '45873659922612332313507173713043621899458142697424133141465876071684443944555',
+    paramKey: '2048',
+    A: '16632455044992761965593295386600020347570869472296431245527107351825708091489578939469425567458283274266561158181740193734709200288418324102659852541446088687820265684380485441595932067523631853800371628007850968538549900969340113792476990948815911503673289562918352388437014999278305054987092210698678571651531356489004796172840602014031716863741821087496631849054726295616469799168735117028945634971717317346994899599063243463030884908879138489641262125318014166104390752697868209271042002856629935565572020368113375057942708426604430274703798793246084366890900461539818021725644396779151972985569416817895456083263',
+    v: '14635941060173048778656595511232629945494416248517220825970800099711551849275381489332204232865076970292734007637004602159272128774087503135843087956035477882287387736802951389924428326394018368719615747298695327395114875239450769572050779773540643079833400528898060840431174161571313783453822981493120769936043862748326146877398964316685351863951830534334598774701214887748649005442675677001657771706119164368408164359311463909059424981213589867050671837826919882312872289460449477346909577148885113845846403336552417613933239922348747430311615944444155093539516053360806727880983757162694857770682774058835103519253',
+    u: '81554261337474058544831831302589800802913444197173368183958827715210115815516',
+    b: '79179337791754027584153220676478511644608608060670460458572047289097548141810',
+    S: '873664438876151141993728424567375209300224023025237208559968341068583094892731423853998447739648964218026690615260900342049159245646608164615098676249355097217069922171049182558305163008638017272778897056926176171197508679338761499836743870084397576760609220283185052062846361992931820502364618864275201230395850722129072436714935638465321971055685123003942251955645456947685942773690131992562558336858074599718594827313384509866922592821817161352747485189486402738174962278916641431079698536628752013617065470543659760686369339804267927990329015160434899002040279699184962929267375083996349169453227543694817911009',
+    K: 'CdqRL3rlOyb1Czcx2V1eZzObSSGpky/+OaVqOd7jmYg=',
+    M: 'tEqd5JeFfzgbNh/vgKZjasWBcBQDDn5wZDT4+1ZK1gs=',
+    HAMK: 'cgmjw88+7ZLwRbaQ7zXshGC/y/ce3KGwleHRfYaqZSw=',
+    s: 'WMQevuCi3srEq3it7WmJLIh33czi0cq//zLdNex/gak=',
+    I: 'phouse512@gmail.com',
+  },
+];
 
 describe('SRP methods', () => {
   describe('genA', () => {
-    it('should return a hex num', () => {
-      const randa = Buffer.alloc(32);
-      crypto.randomFillSync(randa, 0, 32);
+    for (var i=0; i<srpTestCases.length; i++) {
+      const testCase = srpTestCases[i];
+      it(`should generate valid A from a for test case ${i+1}`, () => {
+        const a_num = bigInt(testCase.a);
+        const result = genA(params[testCase.paramKey], Buffer.from(a_num.toString(16), 'hex'));
+        
+        const A_num = bigInt(testCase.A);
+        assert.strictEqual(A_num.toString(16), result);
+      });
+    }
+  });
 
-      const result = genA(params['2048'], randa);
-      console.log(result);
-    });
+  describe('getu', () => {
+    for (var i=0; i<srpTestCases.length; i++) {
+      const testCase = srpTestCases[i];
+      it(`should generate valid u from A, B for test case ${i+1}`, () => {
+        const A_buf = bigIntToBuffer(bigInt(testCase.A), Math.ceil(bigInt(testCase.A).bitLength() / 8));
+        const B_buf = bigIntToBuffer(bigInt(testCase.B), Math.ceil(bigInt(testCase.B).bitLength() / 8));
+        const actualu = getu(params[testCase.paramKey], A_buf, B_buf);
+
+        const expectedu = bigInt(testCase.u)
+        assert.strictEqual(expectedu.toString(16), actualu);
+      });
+    }
+  });
+
+  describe('getk', () => {
+    for (var i=0; i<srpTestCases.length; i++) {
+      const testCase = srpTestCases[i];
+      it(`should generate a valid k for test case ${i+1}`, () => {
+        const actualk = getk(params[testCase.paramKey]);
+
+        const expectedk = bigInt(testCase.k);
+        assert.strictEqual(expectedk.toString(16), actualk);
+      });
+    }
   });
 
   describe('getS', () => {
-    it('should compute S correctly.', () => {
-      const a_num = bigInt('45873659922612332313507173713043621899458142697424133141465876071684443944555');
-      const a_bytes = Buffer.from('656b9247651c925afd33a2516f5e22adab7e01175cb708c289e369a5fcd3366b', 'hex');
-      const B_num = bigInt('189262083140545621011029173565252992825161902861648496362848907250434626639347677891537815985676137224284268166784338264945112031597853565329097506663026883447823907025757364004756750139809610900860797117180439941012054132123330200714595424665762276709372813089917600850419153736186336599587502384042833427784072724643827742125465873452161677092653881802708905609891989523156821715104563686142321387155421476522531188389213060357788094335695267178974785310875290473761386542262679235203887581322265379034646645724671356724107541640585239324550053406702516132444052929649213406113148556155512251798936521051123961244');
-      const B_bytes = Buffer.from('17fce7ca5073e44d84c97a6f87b42ee27fd60e370db320f54561dab8530375a522884ea2a658f4fc853eb323a37e59134296cd364163fc26ec8753159c109b596aab0c3b22ae143ae3f69fad8974f26dc9beec7da13cbf19a0a4d1ef8e511940ab8454610b5247eb97ac298d34fbc77a346f0232e7b1d2f7cf10a38fbb479dbed1e1e3e0cb0563b4113a0412fbc393c470e422c9664ea11faf0cc467a323ff5a218e30ac67686ae8b948e9978075cb45814c3aea1da8c7815ca1b5c03122d58f5e4d6a1b1fd955d6884ccdf6ccdd8c1ece0fbd12adfa173a42d067211c3639b0ca45da7ae18d562563a5e5763c1bf9ad4aa1ae301857a9c8df6a9b1a9834d9c', 'hex');
-      const g_num = bigInt('2');
-      const k_num = bigInt('34704849670668482647683711281700631885066964767156528400561350050202374645357');
-      const k_bytes = Buffer.from('4cba3fb2923e01fb263ddbbb185a01c131c638f2561942e437727e02ca3c266d', 'hex');
-      const u_num = bigInt('81554261337474058544831831302589800802913444197173368183958827715210115815516');
-      const u_bytes = Buffer.from('b44e137dad625179911f58320e98d8f2c2e26e0cc33c9325da59adc326bc185c', 'hex');
-      const x_num = bigInt('96605723904677435393267606990100471890538533552084954682939862203822092241454');
-      const x_bytes = Buffer.from('d594e6ecfd080b05719a3d456b6a0584b38d2236a807ec2a74358afb07d6ca2e', 'hex');
-      // const S_num = bigInt('873664438876151141993728424567375209300224023025237208559968341068583094892731423853998447739648964218026690615260900342049159245646608164615098676249355097217069922171049182558305163008638017272778897056926176171197508679338761499836743870084397576760609220283185052062846361992931820502364618864275201230395850722129072436714935638465321971055685123003942251955645456947685942773690131992562558336858074599718594827313384509866922592821817161352747485189486402738174962278916641431079698536628752013617065470543659760686369339804267927990329015160434899002040279699184962929267375083996349169453227543694817911009');
-      const N_num = bigInt('21766174458617435773191008891802753781907668374255538511144643224689886235383840957210909013086056401571399717235807266581649606472148410291413364152197364477180887395655483738115072677402235101762521901569820740293149529620419333266262073471054548368736039519702486226506248861060256971802984953561121442680157668000761429988222457090413873973970171927093992114751765168063614761119615476233422096442783117971236371647333871414335895773474667308967050807005509320424799678417036867928316761272274230314067548291133582479583061439577559347101961771406173684378522703483495337037655006751328447510550299250924469288819');
+    for (var i=0; i<srpTestCases.length; i++) {
+      const testCase = srpTestCases[i];
+      it(`should generate a valid S for test case ${i+1}`, () => {
+        const k_buf = bigIntToBuffer(bigInt(testCase.k), Math.ceil(bigInt(testCase.k).bitLength() / 8));
+        const x_buf = bigIntToBuffer(bigInt(testCase.x), Math.ceil(bigInt(testCase.x).bitLength() / 8));
+        const a_buf = bigIntToBuffer(bigInt(testCase.a), Math.ceil(bigInt(testCase.a).bitLength() / 8));
+        const B_buf = bigIntToBuffer(bigInt(testCase.B), Math.ceil(bigInt(testCase.B).bitLength() / 8));
+        const u_buf = bigIntToBuffer(bigInt(testCase.u), Math.ceil(bigInt(testCase.u).bitLength() / 8));
+        const actualS = getS(params[testCase.paramKey], k_buf, x_buf, a_buf, B_buf, u_buf);
 
-      // const result = getS(
-      //   params['2048'],
-      //   k_bytes,
-      //   x_bytes,
-      //   a_bytes,
-      //   B_bytes,
-      //   u_bytes,
-      // );
-
-      // console.log('S: ', bigint.toBigIntBE(Buffer.from(result, 'hex')))
-      const base = B_num.subtract(k_num.multiply(g_num.modPow(x_num, N_num)));
-      console.log('Base: ', base);
-      const power = a_num.add(u_num.multiply(x_num));
-      console.log('power: ', power);
-      const S_num = base.modPow(power, N_num);
-      console.log('S_num: ', S_num);
-
-      const euclideanModPow = (a, b, m) => {
-        var x = bigInt(a).modPow(b, m);
-        return x.isNegative() ? x.add(m) : x;
-      }
-
-      console.log('S num euclidean: ', euclideanModPow(base, power, N_num));
-    });
+        const expectedS = bigInt(testCase.S);
+        assert.strictEqual(expectedS.toString(16), actualS);
+      });
+    }
   });
-  
-  describe('getk', () => {
-    it('should return k correctly.', () => {
-      const result = getk(params['2048']);
-      console.log(Buffer.from(result, 'hex').toString('base64'));
-    });
+
+  describe('getK', () => {
+    for (var i=0; i<srpTestCases.length; i++) {
+      const testCase = srpTestCases[i];
+      it(`should generate a valid K for test case ${i+1}`, () => {
+        const S_buf = bigIntToBuffer(bigInt(testCase.S), Math.ceil(bigInt(testCase.S).bitLength() / 8));
+        const actualK = getK(params[testCase.paramKey], S_buf.toString('hex'));
+
+        const expectedK = testCase.K;
+        assert.strictEqual(expectedK, actualK.toString('base64'));
+      });
+    }
+  });
+
+  describe('getM', () => {
+    for (var i=0; i<srpTestCases.length; i++) {
+      const testCase = srpTestCases[i];
+      it(`should generate a valid M for test case ${i+1}`, () => {
+        const I_buf = Buffer.from(testCase.I);
+        const s_buf = Buffer.from(testCase.s, 'base64');
+        const A_buf = bigIntToBuffer(bigInt(testCase.A), Math.ceil(bigInt(testCase.A).bitLength() / 8));
+        const B_buf = bigIntToBuffer(bigInt(testCase.B), Math.ceil(bigInt(testCase.B).bitLength() / 8));
+        const K_buf = Buffer.from(testCase.K, 'base64');
+        const actualM = getM(params[testCase.paramKey], I_buf, s_buf, A_buf, B_buf, K_buf);
+
+        const expectedM = Buffer.from(testCase.M, 'base64');
+        assert.isTrue(expectedM.equals(actualM));
+      });
+    }
+  });
+
+  describe('getHAMK', () => {
+    for (var i=0; i<srpTestCases.length; i++) {
+      const testCase = srpTestCases[i];
+      it(`should generate a valid HAMK for test case ${i+1}`, () => {
+        const A_buf = bigIntToBuffer(bigInt(testCase.A), Math.ceil(bigInt(testCase.A).bitLength() / 8));
+        const M_buf = Buffer.from(testCase.M, 'base64');
+        const K_buf = Buffer.from(testCase.K, 'base64');
+        const actualHAMK = getHAMK(params[testCase.paramKey], A_buf, M_buf, K_buf);
+
+        const expectedHAMK = Buffer.from(testCase.HAMK, 'base64');
+        assert.isTrue(expectedHAMK.equals(actualHAMK));
+      });
+    }
   });
 });

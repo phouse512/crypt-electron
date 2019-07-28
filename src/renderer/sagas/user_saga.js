@@ -7,6 +7,8 @@ import {
 } from '../constants';
 import {
   beginServerAuth,
+  serverAuthFailure,
+  serverAuthSuccess,
   setKeyData,
   setNewUser,
   setUserLocalData,
@@ -146,18 +148,16 @@ function* setMasterPass(action) {
 
 function* serverAuth(action) {
   try {
-    // get A
+    // get A for step one
     const resp = yield ipc.callMain(ipcConstants.SRP_GET_A);
-    console.log(resp);
+
     // send A, I to server
-
-    console.log(action.email);
-
     const result = yield(srpStepOne({
       A: Buffer.from(resp.data.A, 'hex').toString('base64'),
       I: action.email,
     }));
-    console.log(result);
+
+    // compute client M
     const kResp = yield ipc.callMain(ipcConstants.SRP_GET_M, {
       a: resp.data.a,
       A: resp.data.A,
@@ -166,13 +166,34 @@ function* serverAuth(action) {
       s: action.srpSalt,
       x: action.srpx,
     });
-    console.log(kResp);
 
+    // send client M for step 2
     const stepTwoResult = yield(srpStepTwo({
       I: action.email,
       M: Buffer.from(kResp.data.M, 'hex').toString('base64'),
     }));
-    console.log(stepTwoResult);
+
+    if (stepTwoResult.message === 'Invalid user.') {
+      yield put(serverAuthFailure({}));
+      return;
+    }
+
+    // validate server HAMK
+    const serverValid = yield ipc.callMain(ipcConstants.SRP_VALIDATE_HAMK, {
+      A: resp.data.A,
+      M: kResp.data.M,
+      K: kResp.data.K,
+      HAMK: Buffer.from(stepTwoResult.data.HAMK, 'base64').toString('hex'),
+    });
+
+    if (serverValid.error) {
+      yield put(serverAuthFailure({}));
+      return;
+    }
+
+    yield put(serverAuthSuccess({
+      jwt: '',
+    }));
   } catch (err) {
     console.error(err);
   }
