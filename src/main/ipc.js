@@ -16,6 +16,29 @@ import { genA, getHAMK, getk, getK, getM, getS, getu } from './srp';
 import params from './srpParams'
 import { generateCredentials } from './ipcHandler';
 
+ipc.answerRenderer(ipcConstants.DEBUG_SRP, async data => {
+  // get output path
+  try {
+    const currentTime = (new Date).getTime();
+    const outputPath = `${app.getPath('userData')}/srp_log_${currentTime}.json`;
+
+    const outputObj = Object.assign({}, data);
+    fs.writeFileSync(outputPath, JSON.stringify(outputObj));
+    return {
+      error: false,
+      data: {
+        filepath: outputPath,
+      },
+    };
+  } catch (error) {
+    console.error("Received error: ", error)
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});
+
 ipc.answerRenderer(ipcConstants.CHECK_EXISTING_USER, async data => {
   // import credentials file
   const userConfigPath = `${app.getPath('userData')}/${userConfig.USER_CONFIG_FILE}`;

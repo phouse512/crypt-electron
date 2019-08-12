@@ -1,6 +1,6 @@
 import { assert, expect } from 'chai';
 import crypto from 'crypto';
-const bigint = require('bigint-buffer');
+// const bigint = require('bigint-buffer');
 
 import {
   decrypt,
@@ -76,18 +76,18 @@ describe('Crypto methods', () => {
     });
   });
 
-  describe('computeVerifier', () => {
-    const fakeEmail = Buffer.from('phouse512@gmail.com');
-    const fakePw = Buffer.from('pmh518');
-    const fakeSalt = Buffer.from('mVr2alvChAVNPCynNOXmCO4d6ldLRT/kVuo+0wDdw8g=', 'base64');
-    const v = computeVerifier(params['2048'], fakeSalt, fakeEmail, fakePw);
-    const x = getSrpX(params['2048'], fakeSalt, fakeEmail, fakePw);
+  // describe('computeVerifier', () => {
+  //   const fakeEmail = Buffer.from('phouse512@gmail.com');
+  //   const fakePw = Buffer.from('pmh518');
+  //   const fakeSalt = Buffer.from('mVr2alvChAVNPCynNOXmCO4d6ldLRT/kVuo+0wDdw8g=', 'base64');
+  //   const v = computeVerifier(params['2048'], fakeSalt, fakeEmail, fakePw);
+  //   const x = getSrpX(params['2048'], fakeSalt, fakeEmail, fakePw);
 
-    const v_buf = Buffer.from(v, 'hex');
-    const v_num = bigint.toBigIntBE(v_buf)
+  //   const v_buf = Buffer.from(v, 'hex');
+  //   const v_num = bigint.toBigIntBE(v_buf)
 
-    // console.log('v: ', v_num);
-  });
+  //   // console.log('v: ', v_num);
+  // });
 
   describe('encrypt', () => {
     it('should encrypt aes256 gcm and decrypt with same key', () => {

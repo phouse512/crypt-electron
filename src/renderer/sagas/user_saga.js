@@ -1,6 +1,7 @@
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
-// const { ipcRenderer: ipc } = require('electron-better-ipc');
+const bigint = require('bigint-buffer');
 const ipc = require('electron-better-ipc');
+
 import {
   authConstants,
   setupConstants,
@@ -146,6 +147,20 @@ function* setMasterPass(action) {
   }
 }
 
+const debugHelper = (a_buf, A_buf, B_buf, I, K_buf, M_buf, s_buf) => {
+  // convert to ints, dump as json file
+  const outputObj = {
+    a: bigint.toBigIntBE(a_buf).toString(10),
+    A: bigint.toBigIntBE(A_buf).toString(10),
+    B: bigint.toBigIntBE(B_buf).toString(10),
+    I,
+    K: bigint.toBigIntBE(K_buf).toString(10),
+    M: bigint.toBigIntBE(M_buf).toString(10),
+    s: s_buf.toString('base64'),
+  };
+  return outputObj;
+};
+
 function* serverAuth(action) {
   try {
     // get A for step one
@@ -172,8 +187,23 @@ function* serverAuth(action) {
       I: action.email,
       M: Buffer.from(kResp.data.M, 'hex').toString('base64'),
     }));
+    const isValid = !(stepTwoResult.message === 'Invalid user.');
+    if (!isValid && process.env.DEBUG) {
+      console.log('it\'s debug time :D');
+      const outputObj = debugHelper(
+        Buffer.from(resp.data.a, 'hex'),
+        Buffer.from(resp.data.A, 'hex'),
+        Buffer.from(result.data.B, 'base64'),
+        action.email,
+        Buffer.from(kResp.data.K, 'hex'),
+        Buffer.from(kResp.data.M, 'hex'),
+        Buffer.from(action.srpSalt, 'base64'), 
+      );
+      const debugResp = yield ipc.callMain(ipcConstants.DEBUG_SRP, outputObj);
+      console.log('storage output: ', debugResp);
+    }
 
-    if (stepTwoResult.message === 'Invalid user.') {
+    if (!isValid) {
       yield put(serverAuthFailure({}));
       return;
     }

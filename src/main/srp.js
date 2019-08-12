@@ -1,8 +1,8 @@
 const assert = require('assert').strict;
-const bigint = require('bigint-buffer');
 const bigInt = require('big-integer');
 const crypto = require('crypto');
 
+import { toBigIntBE, toBufferBE } from './bigint_buffer';
 import { hexToBigInt } from './srpParams';
 
 const zero = bigInt(0);
@@ -17,7 +17,7 @@ export const genA = (params, secret1) => {
   assert.strictEqual(true, Buffer.isBuffer(secret1));
 
   // convert secret1 to bignum
-  const aNum = bigint.toBigIntBE(secret1);
+  const aNum = toBigIntBE(secret1);
   const A = bigInt(params.g).modPow(aNum, params.N)
   return A.toString('16');
 };
@@ -46,8 +46,8 @@ export const getu = (params, A, B) => {
  */
 export const getk = (params) => {
   const totalLength = params.N_length_bits / 8;
-  const N_buf = bigint.toBufferBE(params.N, totalLength);
-  const g_buf = bigint.toBufferBE(params.g, 1);
+  const N_buf = toBufferBE(params.N, totalLength);
+  const g_buf = toBufferBE(params.g, 1);
 
 
   // const paddedg_buf = Buffer.alloc(totalLength);
@@ -86,11 +86,11 @@ const euclideanModPow = (a, b, m) => {
 export const getS = (params, k, x, a, B, u) => {
   const g = bigInt(params.g);
   const N = bigInt(params.N);
-  const B_num = bigInt(bigint.toBigIntBE(B));
-  const u_num = bigInt(bigint.toBigIntBE(u));
-  const a_num = bigInt(bigint.toBigIntBE(a));
-  const x_num = bigInt(bigint.toBigIntBE(x));
-  const k_num = bigInt(bigint.toBigIntBE(k));
+  const B_num = bigInt(toBigIntBE(B));
+  const u_num = bigInt(toBigIntBE(u));
+  const a_num = bigInt(toBigIntBE(a));
+  const x_num = bigInt(toBigIntBE(x));
+  const k_num = bigInt(toBigIntBE(k));
 
   if (zero.geq(B_num) || N.leq(B_num)) {
     throw new Error('Invalid server-computed B, must be 1..N-1');
@@ -129,7 +129,7 @@ export const getM = (params, I, s, A, B, K) => {
   assert.strictEqual(true, Buffer.isBuffer(K));
 
   // H(N) xor H(g) 
-  const g_buf = bigint.toBufferBE(params.g, 1);
+  const g_buf = toBufferBE(params.g, 1);
   const N_buf = Buffer.from(params.N.toString(16), 'hex');
 
   const H_g = crypto.createHash(params.hash).update(g_buf).digest();
@@ -192,5 +192,5 @@ export const getSrpX = (params, salt, I, P) => {
     .update(hashIP)
     .digest();
 
-    return bigint.toBigIntBE(hashX).toString('16');
+    return toBigIntBE(hashX).toString('16');
 };
