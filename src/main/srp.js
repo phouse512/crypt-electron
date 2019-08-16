@@ -18,7 +18,7 @@ export const genA = (params, secret1) => {
 
   // convert secret1 to bignum
   const aNum = toBigIntBE(secret1);
-  const A = bigInt(params.g).modPow(aNum, params.N)
+  const A = euclideanModPow(bigInt(params.g), aNum, params.N);
   return A.toString('16');
 };
 
@@ -96,7 +96,7 @@ export const getS = (params, k, x, a, B, u) => {
     throw new Error('Invalid server-computed B, must be 1..N-1');
   }
 
-  const base = B_num.subtract(k_num.multiply(g.modPow(x_num, N)));
+  const base = B_num.subtract(k_num.multiply(euclideanModPow(g, x_num, N)));
   const power = a_num.add(u_num.multiply(x_num));
   const S_num = euclideanModPow(base, power, N);
   return S_num.toString('16');
@@ -169,7 +169,7 @@ export const computeVerifier = (params, salt, I, P) => {
 
   // v = g % N
   const x = hexToBigInt(getSrpX(params, salt, I, P));
-  const v = bigInt(params.g).modPow(x, params.N);
+  const v = euclideanModPow(params.g, x, params.N);
 
   // returns hex representation of bigint
   return v.toString('16');
