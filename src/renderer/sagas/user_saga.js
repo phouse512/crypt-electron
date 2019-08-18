@@ -163,67 +163,83 @@ const debugHelper = (a_buf, A_buf, B_buf, I, K_buf, M_buf, s_buf) => {
 
 function* serverAuth(action) {
   try {
-    // get A for step one
-    const resp = yield ipc.callMain(ipcConstants.SRP_GET_A);
+    let count = 0;
+    let success = false;
+    while (count < 3) {
+      count += 1;
+      // get A for step one
+      const resp = yield ipc.callMain(ipcConstants.SRP_GET_A);
 
-    // send A, I to server
-    const result = yield(srpStepOne({
-      A: Buffer.from(resp.data.A, 'hex').toString('base64'),
-      I: action.email,
-    }));
+      // send A, I to server
+      const result = yield(srpStepOne({
+        A: Buffer.from(resp.data.A, 'hex').toString('base64'),
+        I: action.email,
+      }));
 
-    // compute client M
-    const kResp = yield ipc.callMain(ipcConstants.SRP_GET_M, {
-      a: resp.data.a,
-      A: resp.data.A,
-      B: Buffer.from(result.data.B, 'base64').toString('hex'),
-      I: action.email,
-      s: action.srpSalt,
-      x: action.srpx,
-    });
+      console.log('HEX IN SAGA: ', resp.data.A)
+      console.log('Buffer from: ', Buffer.from(resp.data.A, 'hex'))
+      console.log('base64 A: ', Buffer.from(resp.data.A, 'hex').toString('base64'));
 
-    // send client M for step 2
-    const stepTwoResult = yield(srpStepTwo({
-      I: action.email,
-      M: Buffer.from(kResp.data.M, 'hex').toString('base64'),
-    }));
-    const isValid = !(stepTwoResult.message === 'Invalid user.');
-    if (!isValid && process.env.DEBUG) {
-      console.log('it\'s debug time :D');
-      const outputObj = debugHelper(
-        Buffer.from(resp.data.a, 'hex'),
-        Buffer.from(resp.data.A, 'hex'),
-        Buffer.from(result.data.B, 'base64'),
-        action.email,
-        Buffer.from(kResp.data.K, 'hex'),
-        Buffer.from(kResp.data.M, 'hex'),
-        Buffer.from(action.srpSalt, 'base64'), 
-      );
-      const debugResp = yield ipc.callMain(ipcConstants.DEBUG_SRP, outputObj);
-      console.log('storage output: ', debugResp);
+      // compute client M
+      const kResp = yield ipc.callMain(ipcConstants.SRP_GET_M, {
+        a: resp.data.a,
+        A: resp.data.A,
+        B: Buffer.from(result.data.B, 'base64').toString('hex'),
+        I: action.email,
+        s: action.srpSalt,
+        x: action.srpx,
+      });
+
+      // send client M for step 2
+      const stepTwoResult = yield(srpStepTwo({
+        I: action.email,
+        M: Buffer.from(kResp.data.M, 'hex').toString('base64'),
+      }));
+      const isValid = !(stepTwoResult.message === 'Invalid user.');
+      if (!isValid && process.env.DEBUG) {
+        console.log('it\'s debug time :D');
+        const outputObj = debugHelper(
+          Buffer.from(resp.data.a, 'hex'),
+          Buffer.from(resp.data.A, 'hex'),
+          Buffer.from(result.data.B, 'base64'),
+          action.email,
+          Buffer.from(kResp.data.K, 'hex'),
+          Buffer.from(kResp.data.M, 'hex'),
+          Buffer.from(action.srpSalt, 'base64'), 
+        );
+        const debugResp = yield ipc.callMain(ipcConstants.DEBUG_SRP, outputObj);
+        console.log('debug storage output: ', debugResp);
+      }
+
+      if (!isValid) {
+        console.log(`Attempt: ${count} failed on server auth, retrying.`)
+        continue;
+      }
+
+      // validate server HAMK
+      const serverValid = yield ipc.callMain(ipcConstants.SRP_VALIDATE_HAMK, {
+        A: resp.data.A,
+        M: kResp.data.M,
+        K: kResp.data.K,
+        HAMK: Buffer.from(stepTwoResult.data.HAMK, 'base64').toString('hex'),
+      });
+
+      if (serverValid.error) {
+        console.log(`Attempt: ${count} failed on server resp, retrying.`)
+        continue;
+      }
+
+      success = true;
+      break;
+      // get jwt from response
     }
 
-    if (!isValid) {
-      yield put(serverAuthFailure({}));
-      return;
+    if (!success) {
+
+    } else {
+      console.log(`AUTH SUCCESS on attempt: ${count}`);
     }
 
-    // validate server HAMK
-    const serverValid = yield ipc.callMain(ipcConstants.SRP_VALIDATE_HAMK, {
-      A: resp.data.A,
-      M: kResp.data.M,
-      K: kResp.data.K,
-      HAMK: Buffer.from(stepTwoResult.data.HAMK, 'base64').toString('hex'),
-    });
-
-    if (serverValid.error) {
-      yield put(serverAuthFailure({}));
-      return;
-    }
-
-    yield put(serverAuthSuccess({
-      jwt: '',
-    }));
   } catch (err) {
     console.error(err);
   }

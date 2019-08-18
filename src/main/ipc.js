@@ -152,6 +152,7 @@ ipc.answerRenderer(ipcConstants.SRP_GET_A, async data => {
     crypto.randomFillSync(aBuf, 0, 32);
 
     const aHex = genA(params['2048'], aBuf);
+    console.log('SRP GET A A Hex: ', aHex);
     return {
       error: false,
       data: {
