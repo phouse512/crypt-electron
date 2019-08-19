@@ -7,6 +7,7 @@ const paths = {
 };
 
 module.exports = {
+  devtool: 'source-map',
   entry: [
     'babel-polyfill', 
     path.join(paths.SRC, 'renderer/index.jsx'), 
@@ -17,6 +18,9 @@ module.exports = {
     publicPath: '/public/',
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.DEBUG': JSON.stringify(true),
+    }),
   ],
   module: {
     rules: [

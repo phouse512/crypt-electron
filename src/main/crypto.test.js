@@ -1,14 +1,14 @@
 import { assert, expect } from 'chai';
 import crypto from 'crypto';
+// const bigint = require('bigint-buffer');
 
 import {
-  computeVerifier,
   decrypt,
   encrypt,
   generateSalt,
   generateSecretKey,
-  getSrpX,
 } from './crypto';
+import { computeVerifier, getSrpX } from './srp';
 import params from './srpParams';
 import { AssertionError } from 'assert';
 
@@ -78,9 +78,15 @@ describe('Crypto methods', () => {
 
   // describe('computeVerifier', () => {
   //   const fakeEmail = Buffer.from('phouse512@gmail.com');
-  //   const fakePw = Buffer.from('hello');
-  //   const fakeSalt = Buffer.from('fakeSalt');
+  //   const fakePw = Buffer.from('pmh518');
+  //   const fakeSalt = Buffer.from('mVr2alvChAVNPCynNOXmCO4d6ldLRT/kVuo+0wDdw8g=', 'base64');
   //   const v = computeVerifier(params['2048'], fakeSalt, fakeEmail, fakePw);
+  //   const x = getSrpX(params['2048'], fakeSalt, fakeEmail, fakePw);
+
+  //   const v_buf = Buffer.from(v, 'hex');
+  //   const v_num = bigint.toBigIntBE(v_buf)
+
+  //   // console.log('v: ', v_num);
   // });
 
   describe('encrypt', () => {

@@ -1,17 +1,22 @@
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
-// const { ipcRenderer: ipc } = require('electron-better-ipc');
+const bigint = require('bigint-buffer');
 const ipc = require('electron-better-ipc');
+
 import {
   authConstants,
   setupConstants,
 } from '../constants';
 import {
+  beginServerAuth,
+  serverAuthFailure,
+  serverAuthSuccess,
   setKeyData,
   setNewUser,
   setUserLocalData,
   userLogin,
 } from '../actions/auth.actions';
 import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
+import { srpStepOne, srpStepTwo } from '../api/auth';
 import { invitationRequest, registrationRequest } from '../api/invitation';
 import ipcConstants from '../../constants/ipc';
 
@@ -68,6 +73,13 @@ function* unlockUserCredentials(action) {
       yield put(setKeyData({
         mukObj: keyResp.data.mukObj,
         srpObj: keyResp.data.srpObj,
+      }));
+      
+      // try to server auth to get JWT
+      yield put(beginServerAuth({ 
+        email: localUserData.email,
+        srpSalt: keyResp.data.srpObj.salt,
+        srpx: keyResp.data.srpObj.srpx,
       }));
     } else {
       console.log('unable to authenticate successfully')
@@ -135,6 +147,104 @@ function* setMasterPass(action) {
   }
 }
 
+const debugHelper = (a_buf, A_buf, B_buf, I, K_buf, M_buf, s_buf) => {
+  // convert to ints, dump as json file
+  const outputObj = {
+    a: bigint.toBigIntBE(a_buf).toString(10),
+    A: bigint.toBigIntBE(A_buf).toString(10),
+    B: bigint.toBigIntBE(B_buf).toString(10),
+    I,
+    K: bigint.toBigIntBE(K_buf).toString(10),
+    M: bigint.toBigIntBE(M_buf).toString(10),
+    s: s_buf.toString('base64'),
+  };
+  return outputObj;
+};
+
+function* serverAuth(action) {
+  try {
+    let count = 0;
+    let success = false;
+    while (count < 3) {
+      count += 1;
+      // get A for step one
+      const resp = yield ipc.callMain(ipcConstants.SRP_GET_A);
+
+      // send A, I to server
+      const result = yield(srpStepOne({
+        A: Buffer.from(resp.data.A, 'hex').toString('base64'),
+        I: action.email,
+      }));
+
+      console.log('HEX IN SAGA: ', resp.data.A)
+      console.log('Buffer from: ', Buffer.from(resp.data.A, 'hex'))
+      console.log('base64 A: ', Buffer.from(resp.data.A, 'hex').toString('base64'));
+
+      // compute client M
+      const kResp = yield ipc.callMain(ipcConstants.SRP_GET_M, {
+        a: resp.data.a,
+        A: resp.data.A,
+        B: Buffer.from(result.data.B, 'base64').toString('hex'),
+        I: action.email,
+        s: action.srpSalt,
+        x: action.srpx,
+      });
+
+      // send client M for step 2
+      const stepTwoResult = yield(srpStepTwo({
+        I: action.email,
+        M: Buffer.from(kResp.data.M, 'hex').toString('base64'),
+      }));
+      const isValid = !(stepTwoResult.message === 'Invalid user.');
+      if (!isValid && process.env.DEBUG) {
+        console.log('it\'s debug time :D');
+        const outputObj = debugHelper(
+          Buffer.from(resp.data.a, 'hex'),
+          Buffer.from(resp.data.A, 'hex'),
+          Buffer.from(result.data.B, 'base64'),
+          action.email,
+          Buffer.from(kResp.data.K, 'hex'),
+          Buffer.from(kResp.data.M, 'hex'),
+          Buffer.from(action.srpSalt, 'base64'), 
+        );
+        const debugResp = yield ipc.callMain(ipcConstants.DEBUG_SRP, outputObj);
+        console.log('debug storage output: ', debugResp);
+      }
+
+      if (!isValid) {
+        console.log(`Attempt: ${count} failed on server auth, retrying.`)
+        continue;
+      }
+
+      // validate server HAMK
+      const serverValid = yield ipc.callMain(ipcConstants.SRP_VALIDATE_HAMK, {
+        A: resp.data.A,
+        M: kResp.data.M,
+        K: kResp.data.K,
+        HAMK: Buffer.from(stepTwoResult.data.HAMK, 'base64').toString('hex'),
+      });
+
+      if (serverValid.error) {
+        console.log(`Attempt: ${count} failed on server resp, retrying.`)
+        continue;
+      }
+
+      success = true;
+      break;
+      // get jwt from response
+    }
+
+    if (!success) {
+
+    } else {
+      console.log(`AUTH SUCCESS on attempt: ${count}`);
+    }
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 export function* watchCheckExisting() {
   yield takeLatest(authConstants.CHECK_EXISTING_USER, checkExistingUser);
 }
@@ -153,4 +263,8 @@ export function* watchLogin() {
 
 export function* watchUnlockAccount() {
   yield takeEvery(authConstants.UNLOCK_ACCOUNT, unlockUserCredentials);
+}
+
+export function* watchServerAuth() {
+  yield takeEvery(authConstants.BEGIN_SERVER_AUTH, serverAuth);
 }

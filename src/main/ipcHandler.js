@@ -140,6 +140,8 @@ export const generateCredentials = (data) => {
       uuid: uuidv4(),
     };
 
+    console.log('local ephemeral: ', localEphemeralData);
+
     return {
       error: false,
       data: {
