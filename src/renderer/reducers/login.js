@@ -1,12 +1,13 @@
 import { authConstants } from '../constants';
 
 const baseState = {
+  isAuthed: false,
   isLoading: false,
-  newUser: true,
+  jwtData: {},
   localUserData: {},
   mukData: {},
+  newUser: true,
   srpData: {},
-  isAuthed: false,
 };
 
 const login = (state = baseState, action) => {
@@ -27,6 +28,10 @@ const login = (state = baseState, action) => {
     case authConstants.SUCCESSFUL_AUTH:
       return Object.assign({}, state, {
         isAuthed: true,
+      });
+    case authConstants.SUCCESSFUL_SERVER_AUTH:
+      return Object.assign({}, state, {
+        jwtData: action.jwt,
       });
     case authConstants.USER_LOGIN:
       return {

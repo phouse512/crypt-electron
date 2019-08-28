@@ -14,6 +14,8 @@ import {
   setNewUser,
   setUserLocalData,
   userLogin,
+  unsuccessfulAuth,
+  successfulAuth,
 } from '../actions/auth.actions';
 import { setInvitation, setLoadingFlag } from '../actions/setup.actions';
 import { srpStepOne, srpStepTwo } from '../api/auth';
@@ -165,6 +167,7 @@ function* serverAuth(action) {
   try {
     let count = 0;
     let success = false;
+    let jwt = {};
     while (count < 3) {
       count += 1;
       // get A for step one
@@ -230,14 +233,18 @@ function* serverAuth(action) {
       }
 
       success = true;
+      jwt = stepTwoResult.data.jwt;
       break;
       // get jwt from response
     }
 
     if (!success) {
-
+      yield put(serverAuthFailure());
     } else {
       console.log(`AUTH SUCCESS on attempt: ${count}`);
+      yield put(serverAuthSuccess({
+        jwt,
+      }));
     }
 
   } catch (err) {
