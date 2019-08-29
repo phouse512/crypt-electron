@@ -33,6 +33,11 @@ const login = (state = baseState, action) => {
       return Object.assign({}, state, {
         jwtData: action.jwt,
       });
+    case authConstants.UNSUCCESSFUL_SERVER_AUTH:
+      return Object.assign({}, state, {
+        isAuthed: false,
+        mukData: {},
+      });
     case authConstants.USER_LOGIN:
       return {
         isLoading: true,

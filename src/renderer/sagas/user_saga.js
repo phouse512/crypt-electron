@@ -179,10 +179,6 @@ function* serverAuth(action) {
         I: action.email,
       }));
 
-      console.log('HEX IN SAGA: ', resp.data.A)
-      console.log('Buffer from: ', Buffer.from(resp.data.A, 'hex'))
-      console.log('base64 A: ', Buffer.from(resp.data.A, 'hex').toString('base64'));
-
       // compute client M
       const kResp = yield ipc.callMain(ipcConstants.SRP_GET_M, {
         a: resp.data.a,
@@ -246,7 +242,6 @@ function* serverAuth(action) {
         jwt,
       }));
     }
-
   } catch (err) {
     console.error(err);
   }
