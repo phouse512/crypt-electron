@@ -9,7 +9,7 @@ export const listItems = ({ albumId, jwt }) => {
   const request = new Request(url, {
     method: 'GET',
     headers: new Headers({
-      'crypt-api-key': jwt,
+      'crypt-api-key': `Bearer ${jwt}`,
     }),
   });
 
