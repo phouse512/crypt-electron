@@ -1,7 +1,10 @@
 import { itemConstants } from '../constants';
 
 const baseState = {
-
+  albumIds: [],
+  albums: {},
+  itemIds: [],
+  items: {},
 };
 
 const items = (state = baseState, action) => {
