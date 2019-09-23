@@ -9,6 +9,8 @@ import AppWrapper from './containers/AppWrapper';
 import cryptApp from './reducers/index';
 import initSagas from './initSagas';
 
+import '../../stylesheets/main.scss';
+
 const sagaMiddleware = createSagaMiddleware();
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

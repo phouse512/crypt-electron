@@ -1,0 +1,27 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+}
+
+.app-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+
+.app-nav {
+  flex-grow: 0;
+  flex-basis: 200px;
+  background-color: red;
+}
+
+.app-body { 
+  flex-grow: 1;
+  background-color: blue;
+}

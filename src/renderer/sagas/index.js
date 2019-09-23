@@ -8,5 +8,6 @@ export {
 } from './user_saga';
 
 export {
+  watchFetchAlbums,
   watchFetchItems,
 } from './item_saga';

@@ -3,7 +3,7 @@ import { urlConstants } from '../constants';
 import { queryParams } from './util';
 
 export const listAlbums = ({ jwt }) => {
-  const url = `${urlConstants.BASE_URL}/albums`;
+  const url = `${urlConstants.BASE_URL}/album`;
   const request = new Request(url, {
     method: 'GET',
     headers: new Headers({

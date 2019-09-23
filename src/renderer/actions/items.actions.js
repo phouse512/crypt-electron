@@ -1,6 +1,6 @@
 import { itemConstants } from '../constants';
 
-export const fetchAlbums = ({}) => ({
+export const fetchAlbums = () => ({
   type: itemConstants.FETCH_ALBUMS_REQUEST,
 });
 
