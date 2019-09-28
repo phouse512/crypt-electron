@@ -2,7 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { viewsEnum } from '../constants';
 import { fetchAlbums, fetchItems } from '../actions/items.actions';
+
+import AlbumsDash from '../components/AlbumsDash';
 
 export class DashboardContainer extends React.Component {
   componentWillMount() {
@@ -14,24 +17,33 @@ export class DashboardContainer extends React.Component {
   }
 
   render() {
+    let viewComponent;
+    switch(this.props.views.currentView) {
+      case viewsEnum.ALBUMS:
+        viewComponent = <AlbumsDash />;
+        break;
+      default:
+        viewComponent = <div />;
+    }
+
     return (
       <div className="app-container">
         <div className="app-nav">
           Test
         </div>
         <div className="app-body">
-          HI welcome to the dashboard yo.
+          {viewComponent}
         </div>
       </div>
     );
   }
 }
 
-
 DashboardContainer.propTypes = {};
 
 const mapStateToProps = (state) => ({
   items: state.items,
+  views: state.views,
 });
 
 const mapDispatchToProps = dispatch => ({
