@@ -7,7 +7,11 @@ import { fetchAlbums, fetchItems } from '../actions/items.actions';
 import { changeView } from '../actions/views.actions';
 
 import AlbumsDash from '../components/AlbumsDash';
+import ManageDash from '../components/ManageDash';
 import Navbar from '../components/Navbar';
+import PhotosDash from '../components/PhotosDash';
+import SearchBar from '../components/SearchBar';
+
 
 export class DashboardContainer extends React.Component {
   componentWillMount() {
@@ -22,7 +26,19 @@ export class DashboardContainer extends React.Component {
     let viewComponent;
     switch(this.props.views.currentView) {
       case viewsEnum.ALBUMS:
-        viewComponent = <AlbumsDash />;
+        viewComponent = <AlbumsDash
+          albums={this.props.albums}
+          goToAlbum={this.props.goToAlbum}
+        />;
+        break;
+      case viewsEnum.MANAGE:
+        viewComponent = <ManageDash />;
+        break;
+      case viewsEnum.PHOTOS:
+        viewComponent = <PhotosDash
+          params={this.props.views.params}
+          photos={this.props.items}
+        />;
         break;
       default:
         viewComponent = <div />;
@@ -37,6 +53,7 @@ export class DashboardContainer extends React.Component {
           />
         </div>
         <div className="app-body">
+          <SearchBar />
           {viewComponent}
         </div>
       </div>
@@ -47,7 +64,8 @@ export class DashboardContainer extends React.Component {
 DashboardContainer.propTypes = {};
 
 const mapStateToProps = (state) => ({
-  items: state.items,
+  albums: state.items.albumIds.map(id => state.items.albums[id]),
+  items: state.items.itemIds.map(id => state.items.itemIds[id]),
   views: state.views,
 });
 
@@ -55,6 +73,10 @@ const mapDispatchToProps = dispatch => ({
   changeView: (view) => dispatch(changeView({ view })),
   fetchAlbums: () => dispatch(fetchAlbums()),
   fetchItems: (albumId) => dispatch(fetchItems({ albumId })),
+  goToAlbum: (albumId) => dispatch(changeView({
+    params: {album: [albumId]},
+    view: viewsEnum.PHOTOS,
+  })),
 });
 
 const DashboardWrapper = connect(

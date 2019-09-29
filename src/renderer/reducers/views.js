@@ -10,6 +10,7 @@ const views = (state = baseState, action) => {
     case viewConstants.SET_VIEW:
       return Object.assign({}, state, {
         currentView: action.view,
+        params: action.params,
       });
     default:
       return state;
