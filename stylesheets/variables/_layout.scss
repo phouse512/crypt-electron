@@ -1,0 +1,45 @@
+$line-height: 1.5em;
+$none: 0;
+
+// padding values
+$sm-padding: 7px;
+$md-padding: 15px;
+$lg-padding: 30px;
+$x-lg-padding: 45px;
+
+$-sm-padding: -7px;
+$-md-padding: -15px;
+$-lg-padding: -30px;
+
+// margin values
+$x-sm-margin: 3px;
+$sm-margin: 7px;
+$md-margin: 15px;
+$ml-margin: 25px;
+$lg-margin: 30px;
+$x-lg-margin: 45px;
+$xx-lg-margin: 90px;
+
+$-sm-margin: -7px;
+$-md-margin: -15px;
+$-lg-margin: -30px;
+
+$main-view-mg-tb: 0.5rem;
+$main-view-mg-lr: 1rem;
+$-main-view-mg-tb: -$main-view-mg-tb;
+$-main-view-mg-lr: -$main-view-mg-lr;
+
+// media queries
+$lg-min: "only screen and (min-width:1200px)";
+$md-min: "only screen and (min-width:992px)";
+$md-max: "only screen and (max-width:992px)";
+$sm-min: "only screen and (min-width:675px)";
+$sm-max: "only screen and (max-width:675px)";
+
+$short-max: "only screen and (max-height:550px)";
+// for :after and :before elements
+$auto: auto;
+$zero: 0;
+$empty: "";
+
+$panel-header-height: 185px;

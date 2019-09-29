@@ -52,6 +52,14 @@ export class AppWrapperComponent extends React.Component {
       )
     }
 
+    if (isEmpty(this.props.jwtData)) {
+      return (
+        <div className="container-flex">
+          Server auth...
+        </div>
+      );
+    }
+
     return (
       <HashRouter>
         <Route path="/" component={DashboardContainer} />
@@ -66,7 +74,9 @@ const mapStateToProps = (state) => ({
   setup: state.setup,
   registerNew: state.setup.registerNew,
   newUser: state.login.newUser,
+  isAuthed: state.login.isAuthed,
   isLoading: state.login.isLoading,
+  jwtData: state.login.jwtData,
   mukData: state.login.mukData,
   srpData: state.login.srpData,
 });

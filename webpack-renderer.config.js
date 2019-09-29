@@ -7,7 +7,7 @@ const paths = {
 };
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: 'eval-source-map',
   entry: [
     'babel-polyfill', 
     path.join(paths.SRC, 'renderer/index.jsx'), 
@@ -31,6 +31,14 @@ module.exports = {
           'babel-loader',
         ],
       },
+      {
+        test: /\.scss$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          { loader: 'sass-loader' },
+        ],
+      }
     ],
   },
   node: { __dirname: true },

@@ -1,0 +1,24 @@
+.navbar {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Work Sans', sans-serif;
+  height: 100%;
+  justify-content: flex-start;
+
+  &__item {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    font-size: 18px;
+    justify-content: center;
+    min-height: 50px;
+
+    &__selected {
+      color: $accent-primary;
+    }
+  }
+
+  &__item:hover {
+    background-color: $grey-light;
+  }
+}
