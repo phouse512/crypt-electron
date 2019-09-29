@@ -6,4 +6,6 @@ export const viewConstants = {
 
 export const viewsEnum = {
   ALBUMS: 'ALBUMS',
+  PHOTOS: 'PHOTOS',
+  MANAGE: 'MANAGE',
 };

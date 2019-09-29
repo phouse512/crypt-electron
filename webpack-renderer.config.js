@@ -7,7 +7,7 @@ const paths = {
 };
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: 'eval-source-map',
   entry: [
     'babel-polyfill', 
     path.join(paths.SRC, 'renderer/index.jsx'), 

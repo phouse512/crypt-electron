@@ -4,8 +4,10 @@ import { connect } from 'react-redux';
 
 import { viewsEnum } from '../constants';
 import { fetchAlbums, fetchItems } from '../actions/items.actions';
+import { changeView } from '../actions/views.actions';
 
 import AlbumsDash from '../components/AlbumsDash';
+import Navbar from '../components/Navbar';
 
 export class DashboardContainer extends React.Component {
   componentWillMount() {
@@ -29,7 +31,10 @@ export class DashboardContainer extends React.Component {
     return (
       <div className="app-container">
         <div className="app-nav">
-          Test
+          <Navbar
+            changeView={this.props.changeView}
+            currentView={this.props.views.currentView}
+          />
         </div>
         <div className="app-body">
           {viewComponent}
@@ -47,6 +52,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  changeView: (view) => dispatch(changeView({ view })),
   fetchAlbums: () => dispatch(fetchAlbums()),
   fetchItems: (albumId) => dispatch(fetchItems({ albumId })),
 });

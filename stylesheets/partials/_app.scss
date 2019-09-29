@@ -1,6 +1,7 @@
 html, body {
   height: 100%;
   margin: 0;
+  font-family: 'Montserrat', sans-serif;
 }
 
 #app {
@@ -14,14 +15,13 @@ html, body {
   width: 100%;
 }
 
-
 .app-nav {
+  flex-basis: 60px;
   flex-grow: 0;
-  flex-basis: 200px;
-  background-color: red;
+  height: 100%;
 }
 
 .app-body { 
+  // background-color: blue;
   flex-grow: 1;
-  background-color: blue;
 }
