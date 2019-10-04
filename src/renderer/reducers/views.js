@@ -10,7 +10,26 @@ const views = (state = baseState, action) => {
     case viewConstants.SET_VIEW:
       return Object.assign({}, state, {
         currentView: action.view,
-        params: action.params,
+        params: {
+          ...state.params,
+          ...action.params,
+        },
+      });
+    case viewConstants.REMOVE_PHOTO_FILTER:
+      // check if type exists
+      if (!state.params.hasOwnProperty(action.filter)) {
+        return Object.assign({}, state, {});
+      }
+
+      // if does, see if value
+      const index = state.params[action.filter].indexOf(action.value);
+      if (index < 0) {
+        return Object.assign({}, state, {});
+      }
+
+      state.params[action.filter].splice(index);
+      return Object.assign({}, state, {
+        params: state.params,
       });
     default:
       return state;

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const PhotoFilters = ({
   filters,
+  removeFilter,
 }) => {
   return (
     <div className="photo-filters">
@@ -10,6 +11,9 @@ const PhotoFilters = ({
       {filters.map(filterObj => (
         <div className="photo-filters__card">
           {filterObj.type} - {filterObj.value}
+          <span
+            onClick={() => removeFilter(filterObj.type, filterObj.value)}
+          ><i class="fas fa-times"></i></span>
         </div>
       ))}
     </div>
@@ -22,6 +26,7 @@ PhotoFilters.PropTypes = {
     type: PropTypes.string,
     value: PropTypes.string,
   })).isRequired,
+  removeFilter: PropTypes.func.isRequired,
 };
 
 export default PhotoFilters;

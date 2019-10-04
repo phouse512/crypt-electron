@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { viewsEnum } from '../constants';
 import { fetchAlbums, fetchItems } from '../actions/items.actions';
-import { changeView } from '../actions/views.actions';
+import { changeView, removePhotoFilter } from '../actions/views.actions';
 
 import AlbumsDash from '../components/AlbumsDash';
 import ManageDash from '../components/ManageDash';
@@ -38,6 +38,7 @@ export class DashboardContainer extends React.Component {
         viewComponent = <PhotosDash
           params={this.props.views.params}
           photos={this.props.items}
+          removePhotoFilter={this.props.removePhotoFilter}
         />;
         break;
       default:
@@ -77,6 +78,7 @@ const mapDispatchToProps = dispatch => ({
     params: {album: [albumId]},
     view: viewsEnum.PHOTOS,
   })),
+  removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
 });
 
 const DashboardWrapper = connect(

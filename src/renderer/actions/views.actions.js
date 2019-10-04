@@ -5,3 +5,9 @@ export const changeView = ({ view, params = {} }) => ({
   params,
   view,
 });
+
+export const removePhotoFilter = ({ filter, value }) => ({
+  type: viewConstants.REMOVE_PHOTO_FILTER,
+  filter,
+  value,
+});
