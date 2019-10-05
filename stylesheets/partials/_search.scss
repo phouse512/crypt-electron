@@ -1,0 +1,17 @@
+.search-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  min-height: 50px;
+  width: 100%;
+}
+
+.search-section {
+  background-color: red;
+}
+
+.shortcut-bar {
+  display: flex;
+  flex-direction: row;
+  font-size: $icon-size-lg;
+}

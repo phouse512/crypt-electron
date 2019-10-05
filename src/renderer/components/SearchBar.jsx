@@ -4,7 +4,12 @@ import PropTypes from 'prop-types';
 const SearchBar = ({}) => {
   return (
     <div className="search-bar">
-      Searchity Search
+      <div className="search-section">
+        Searchity Search
+      </div>
+      <div className="shortcut-bar">
+        <i class="far fa-plus-square"></i>
+      </div>
     </div>
   );
 };
