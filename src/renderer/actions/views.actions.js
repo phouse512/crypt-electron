@@ -11,3 +11,8 @@ export const removePhotoFilter = ({ filter, value }) => ({
   filter,
   value,
 });
+
+export const changePhotoModalState = ({ newState }) => ({
+  type: viewConstants.CHANGE_PHOTO_MODAL_STATE,
+  newState,
+});

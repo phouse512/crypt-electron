@@ -3,7 +3,7 @@
   flex-direction: row;
   justify-content: space-between;
   min-height: 50px;
-  width: 100%;
+  padding: $sm-padding;
 }
 
 .search-section {
@@ -11,7 +11,12 @@
 }
 
 .shortcut-bar {
+  align-items: center;
   display: flex;
   flex-direction: row;
   font-size: $icon-size-lg;
+
+  i {
+    cursor: pointer;
+  }
 }

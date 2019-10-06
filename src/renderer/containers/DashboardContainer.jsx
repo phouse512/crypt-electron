@@ -4,8 +4,13 @@ import { connect } from 'react-redux';
 
 import { viewsEnum } from '../constants';
 import { fetchAlbums, fetchItems } from '../actions/items.actions';
-import { changeView, removePhotoFilter } from '../actions/views.actions';
+import { 
+  changePhotoModalState, 
+  changeView, 
+  removePhotoFilter,
+} from '../actions/views.actions';
 
+import AddPhotoModal from '../components/modals/AddPhotoModal';
 import AlbumsDash from '../components/AlbumsDash';
 import ManageDash from '../components/ManageDash';
 import Navbar from '../components/Navbar';
@@ -54,9 +59,16 @@ export class DashboardContainer extends React.Component {
           />
         </div>
         <div className="app-body">
-          <SearchBar />
+          <SearchBar
+            openPhotoModal={() => this.props.changePhotoModal(true)}
+          />
           {viewComponent}
         </div>
+        <AddPhotoModal
+          closeHandler={() => this.props.changePhotoModal(false)}
+          isOpen={this.props.views.photoModalState}
+          openHandler={() => console.log('open handler')}
+        />
       </div>
     );
   }
@@ -78,6 +90,7 @@ const mapDispatchToProps = dispatch => ({
     params: {album: [albumId]},
     view: viewsEnum.PHOTOS,
   })),
+  changePhotoModal: (newState) => dispatch(changePhotoModalState({ newState })),
   removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
 });
 

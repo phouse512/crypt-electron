@@ -3,6 +3,7 @@ import { viewConstants, viewsEnum } from '../constants';
 const baseState = {
   currentView: viewsEnum.ALBUMS,
   params: {},
+  photoModalState: false,
 };
 
 const views = (state = baseState, action) => {
@@ -30,6 +31,10 @@ const views = (state = baseState, action) => {
       state.params[action.filter].splice(index);
       return Object.assign({}, state, {
         params: state.params,
+      });
+    case viewConstants.CHANGE_PHOTO_MODAL_STATE:
+      return Object.assign({}, state, {
+        photoModalState: action.newState,
       });
     default:
       return state;
