@@ -152,7 +152,7 @@ ipc.answerRenderer(ipcConstants.SRP_GET_A, async data => {
     crypto.randomFillSync(aBuf, 0, 32);
 
     const aHex = genA(params['2048'], aBuf);
-    console.log('SRP GET A A Hex: ', aHex);
+    // console.log('SRP GET A A Hex: ', aHex);
     return {
       error: false,
       data: {
@@ -173,26 +173,26 @@ ipc.answerRenderer(ipcConstants.SRP_GET_M, async data => {
   try {
     // data has A, B, a, x
     const A_buf = Buffer.from(data.A, 'hex');
-    console.log('A_buf: ', A_buf.toString('base64'))
+    // console.log('A_buf: ', A_buf.toString('base64'))
     const a_buf = Buffer.from(data.a, 'hex');
-    console.log('a_buf: ', a_buf.toString('base64'))
+    // console.log('a_buf: ', a_buf.toString('base64'))
     const B_buf = Buffer.from(data.B, 'hex');
-    console.log('B_buf: ', B_buf.toString('base64'))
+    // console.log('B_buf: ', B_buf.toString('base64'))
     const x_buf = Buffer.from(data.x, 'hex');
     const k_buf = Buffer.from(getk(params['2048']), 'hex');
-    console.log('k_buf: ', k_buf.toString('base64'));
+    // console.log('k_buf: ', k_buf.toString('base64'));
     const u_buf = Buffer.from(getu(params['2048'], A_buf, B_buf), 'hex');
-    console.log('u_buf: ', u_buf.toString('base64'));
+    // console.log('u_buf: ', u_buf.toString('base64'));
     const I_buf = Buffer.from(data.I);
     const s_buf = Buffer.from(data.s, 'base64');
     
 
     const S = getS(params['2048'], k_buf, x_buf, a_buf, B_buf, u_buf);
-    console.log('S: ', Buffer.from(S, 'hex').toString('base64'));
+    // console.log('S: ', Buffer.from(S, 'hex').toString('base64'));
     const K_buf = getK(params['2048'], S);
-    console.log('K_buf: ', K_buf.toString('base64'))
+    // console.log('K_buf: ', K_buf.toString('base64'))
     const M = getM(params['2048'], I_buf, s_buf, A_buf, B_buf, K_buf);
-    console.log('M: ', M.toString('base64'));
+    // console.log('M: ', M.toString('base64'));
     return {
       error: false,
       data: {
@@ -238,3 +238,21 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
     };
   }
 });
+
+ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
+  try {
+    console.log(data);
+    return {
+      error: false,
+      data: {
+        image: 'HI',
+      },
+    };
+  } catch (err) {
+    console.error('Unable to encrypt photo.');
+    return {
+      error: true,
+      data: {},
+    }
+  }
+})
