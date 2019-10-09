@@ -14,6 +14,7 @@ export default class FieldFileInput extends React.Component {
       name: file.name,
       path: file.path,
       type: file.type,
+      muk: this.props.mukObj,
     });
     return resp;
   }

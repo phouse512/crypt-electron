@@ -67,6 +67,7 @@ export class DashboardContainer extends React.Component {
         <AddPhotoModal
           closeHandler={() => this.props.changePhotoModal(false)}
           isOpen={this.props.views.photoModalState}
+          mukObj={this.props.mukObj}
           openHandler={() => console.log('open handler')}
         />
       </div>
@@ -79,6 +80,7 @@ DashboardContainer.propTypes = {};
 const mapStateToProps = (state) => ({
   albums: state.items.albumIds.map(id => state.items.albums[id]),
   items: state.items.itemIds.map(id => state.items.itemIds[id]),
+  mukObj: state.login.mukData,
   views: state.views,
 });
 

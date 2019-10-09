@@ -242,6 +242,8 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
   try {
     console.log(data);
+    // load file into buffer
+    const imageBuffer = fs.readFileSync(data.path);
     return {
       error: false,
       data: {

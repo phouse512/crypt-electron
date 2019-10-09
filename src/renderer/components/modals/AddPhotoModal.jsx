@@ -7,6 +7,7 @@ import AddPhotoForm from '../forms/AddPhotoForm';
 const AddPhotoModal = ({
   closeHandler,
   isOpen,
+  mukObj,
   openHandler,
 }) => (
   <ReactModal
@@ -15,6 +16,7 @@ const AddPhotoModal = ({
     onRequestClose={closeHandler}
   >
     <AddPhotoForm
+      mukObj={mukObj}
       onSubmit={values=> console.log(values)}
     />
   </ReactModal>
@@ -24,6 +26,7 @@ AddPhotoModal.defaultProps = {};
 AddPhotoModal.PropTypes = {
   closeHandler: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
+  mukObj: PropTypes.shape({}).isRequired,
   openHandler: PropTypes.func.isRequired,
 };
 
