@@ -9,6 +9,7 @@ import userConfig from '../constants/storage';
 import {
   decrypt,
   derivePrivateKeys,
+  encrypt,
   generateSalt, 
   generateSecretKey,
 } from './crypto';
@@ -241,17 +242,30 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
 
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
   try {
-    console.log(data);
     // load file into buffer
     const imageBuffer = fs.readFileSync(data.path);
+
+    // use muk data to use different algo
+    let encryptedImage;
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
+    encryptedImage = encrypt(data.muk.alg, mukBuffer, imageBuffer);
+
+    // checksum image buffer
+    const hash = crypto.createHash('sha256');
+    hash.update(imageBuffer);
+    const imageCheckSum = hash.digest('base64');
+
+    // return base64 encoded encrypted buffer
+    // return checksum
     return {
       error: false,
       data: {
-        image: 'HI',
+        image: encryptedImage.toString('base64'),
+        imageHash: imageCheckSum,
       },
     };
   } catch (err) {
-    console.error('Unable to encrypt photo.');
+    console.error('Unable to encrypt photo: ', err);
     return {
       error: true,
       data: {},
