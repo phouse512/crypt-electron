@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { viewsEnum } from '../constants';
-import { fetchAlbums, fetchItems } from '../actions/items.actions';
+import { 
+  fetchAlbums, 
+  fetchItems,
+  postItemRequest,
+} from '../actions/items.actions';
 import { 
   changePhotoModalState, 
   changeView, 
@@ -69,6 +73,7 @@ export class DashboardContainer extends React.Component {
           isOpen={this.props.views.photoModalState}
           mukObj={this.props.mukObj}
           openHandler={() => console.log('open handler')}
+          saveImageRequest={this.props.saveImageRequest}
         />
       </div>
     );
@@ -94,6 +99,8 @@ const mapDispatchToProps = dispatch => ({
   })),
   changePhotoModal: (newState) => dispatch(changePhotoModalState({ newState })),
   removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
+  saveImageRequest: ({ albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash}) => dispatch(postItemRequest({ 
+      albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash })),
 });
 
 const DashboardWrapper = connect(

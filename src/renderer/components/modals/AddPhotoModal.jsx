@@ -9,6 +9,7 @@ const AddPhotoModal = ({
   isOpen,
   mukObj,
   openHandler,
+  saveImageRequest,
 }) => (
   <ReactModal
     contentLabel="Minimal Sample Modal"
@@ -17,7 +18,13 @@ const AddPhotoModal = ({
   >
     <AddPhotoForm
       mukObj={mukObj}
-      onSubmit={values=> console.log(values)}
+      onSubmit={values => saveImageRequest({
+        albumId: 1,
+        itemData: values.photoField.image,
+        itemDataHash: values.photoField.encImageHash,
+        itemMetadata: "",
+        itemMetadataHash: "",
+      })}
     />
   </ReactModal>
 );
@@ -28,6 +35,7 @@ AddPhotoModal.PropTypes = {
   isOpen: PropTypes.bool.isRequired,
   mukObj: PropTypes.shape({}).isRequired,
   openHandler: PropTypes.func.isRequired,
+  saveImageRequest: PropTypes.func.isRequired,
 };
 
 export default AddPhotoModal;

@@ -2,7 +2,7 @@ import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
 
 import { setAlbums, setItems } from '../actions/items.actions';
 import { itemConstants } from '../constants';
-import { listAlbums, listItems } from '../api/items';
+import { listAlbums, listItems, postItem } from '../api/items';
 
 export const getJWToken = (state) => state.login.jwtData.encoded_token;
 
@@ -27,6 +27,26 @@ function* fetchItems(action) {
     jwt: jwtoken,
   });
   console.log(result);
+}
+
+function* postItemSaga(action) {
+  console.log('posting item');
+  const jwtoken = yield select(getJWToken);
+
+  const result = yield postItem({
+    albumId: action.albumId,
+    itemData: action.itemData,
+    itemDataHash: action.itemDataHash,
+    itemMetadata: action.itemMetadata,
+    itemMetadataHash: action.itemMetadataHash,
+    jwt: jwtoken,
+  });
+
+  console.log(result);
+}
+
+export function* watchPostItem() {
+  yield takeLatest(itemConstants.POST_ITEM_REQUEST, postItemSaga);
 }
 
 export function* watchFetchAlbums() {

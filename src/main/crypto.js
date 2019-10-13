@@ -17,13 +17,13 @@ const VERSION = 'crypt-0.01';
 const aes256gcmEncrypt = (key, data) => {
   const iv = Buffer.alloc(16);
   crypto.randomFillSync(iv, 0);
-  console.log('IV ENCRYPT')
-  console.log(iv.toString('base64'))
+  // console.log('IV ENCRYPT')
+  // console.log(iv.toString('base64'))
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
   const cipherText = Buffer.concat([cipher.update(data), cipher.final()]);
   const authTag = cipher.getAuthTag();
-  console.log('AUTH TAG');
-  console.log(authTag.toString('base64'));
+  // console.log('AUTH TAG');
+  // console.log(authTag.toString('base64'));
   
   // create byte that indicates IV length
   let bufferLength = Buffer.alloc(1);

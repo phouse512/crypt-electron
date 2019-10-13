@@ -2,6 +2,7 @@ const { app } = require('electron');
 const crypto = require('crypto');
 // const {ipcMain: ipc} = require('electron-better-ipc');
 const ipc = require('electron-better-ipc');
+import { SHA3 } from 'sha3';
 import fs from 'fs';
 
 import ipcConstants from '../constants/ipc';
@@ -206,7 +207,7 @@ ipc.answerRenderer(ipcConstants.SRP_GET_M, async data => {
     return {
       error: true,
       data: {},
-    }
+    };
   }
 });
 
@@ -240,6 +241,38 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
   }
 });
 
+ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
+  try {
+    // stringify metadata obj
+    const metadataStr = JSON.stringify(data.metadata);
+
+    // encrypt metadata
+    const metadataBuf = Buffer.from(metadataStr, 'utf-8');
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
+    const encryptedMetadata = encrypt(data.muk.alg, mukBuffer, metadataBuf);
+
+    // checksum encrypted metadata
+    const hash = new SHA3(512);
+    hash.update(encryptedMetadata);
+    const metadataCheckSum = hash.digest('base64');
+
+    return {
+      error: false,
+      data: {
+        metadata: encryptedMetadata.toString('base64'),
+        metadataHash: metadataCheckSum,
+      }
+    }
+
+  } catch (error) {
+    console.error('Unable to encrypt metadata: ', err);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});
+
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
   try {
     // load file into buffer
@@ -251,9 +284,14 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
     encryptedImage = encrypt(data.muk.alg, mukBuffer, imageBuffer);
 
     // checksum image buffer
-    const hash = crypto.createHash('sha256');
+    const hash = new SHA3(512);
     hash.update(imageBuffer);
     const imageCheckSum = hash.digest('base64');
+
+    // checksum encrypted image
+    const encryptedHash = new SHA3(512);
+    encryptedHash.update(encryptedImage);
+    const encImageCheckSum = encryptedHash.digest('base64');
 
     // return base64 encoded encrypted buffer
     // return checksum
@@ -261,7 +299,8 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
       error: false,
       data: {
         image: encryptedImage.toString('base64'),
-        imageHash: imageCheckSum,
+        originalImageHash: imageCheckSum,
+        encImageHash: encImageCheckSum,
       },
     };
   } catch (err) {
@@ -271,4 +310,4 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
       data: {},
     }
   }
-})
+});

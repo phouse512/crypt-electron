@@ -24,15 +24,18 @@ export default class FieldFileInput extends React.Component {
     const targetFile = e.target.files[0];
     if (targetFile) {
       const val = await this.getEncryptedBase64(targetFile);
-      console.log(val);
-      onChange(val);
+      if (val.error) {
+        alert("ERROR");
+        onChange(null);
+      } else {
+        onChange(val.data);
+      }
     } else {
       onChange(null);
     }
   }
 
   render() {
-    console.log(this.props);
     const { input: { value } } = this.props;
     const { input, label, required, meta, } = this.props;
     return (

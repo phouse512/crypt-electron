@@ -3,18 +3,23 @@ import { Field, reduxForm } from 'redux-form';
 import PropTypes from 'prop-types';
 
 import FieldFileInput from './FieldFileInput';
+import FieldMetadataInput from './FieldMetadataInput';
 import AddPhotoModal from '../modals/AddPhotoModal';
 
 let AddPhotoForm = props => {
-  console.log(props);
   const { handleSubmit } = props;
   return (
     <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor="photoField">Add Photo:</label>
-        <Field 
-          name="photoField" 
+        <Field
+          name="photoField"
           component={FieldFileInput}
+          mukObj={props.mukObj}
+        />
+        <Field
+          name="metadata"
+          component={FieldMetadataInput}
           mukObj={props.mukObj}
         />
       </div>
