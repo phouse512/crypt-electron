@@ -311,3 +311,26 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
     }
   }
 });
+
+ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
+  try {
+    // loop through images
+    for (var i=0; i < data.items.length; i++) {
+      console.log(data.item[i]);
+    }
+
+    return {
+      error: false,
+      data: {},
+    };
+    // download each image 
+
+    // send event    
+  } catch (error) {
+    console.error('unable to load photos: ', err);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});

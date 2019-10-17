@@ -1,10 +1,19 @@
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
+const ipc = require('electron-better-ipc');
 
-import { setAlbums, setItems } from '../actions/items.actions';
+import {
+  postItemFailure,
+  postItemSuccess,
+  setAlbums, 
+  setItems
+} from '../actions/items.actions';
+import { changePhotoModalState } from '../actions/views.actions';
 import { itemConstants } from '../constants';
 import { listAlbums, listItems, postItem } from '../api/items';
+import ipcConstants from '../../constants/ipc';
 
 export const getJWToken = (state) => state.login.jwtData.encoded_token;
+export const getMukObj = (state) => state.login.mukData;
 
 function* fetchAlbumSaga(action) {
   console.log('fetching albums with action: ', action);
@@ -19,30 +28,53 @@ function* fetchAlbumSaga(action) {
 }
 
 function* fetchItems(action) {
-  console.log('fetching items with action: ', action);
   const jwtoken = yield select(getJWToken);
 
   const result = yield listItems({
     albumId: action.albumId,
     jwt: jwtoken,
   });
-  console.log(result);
+
+  yield put(setItems({ items: result.data.items }));
 }
 
 function* postItemSaga(action) {
-  console.log('posting item');
-  const jwtoken = yield select(getJWToken);
+  try {
+    // get muk obj
+    const mukObj = yield select(getMukObj);
 
-  const result = yield postItem({
-    albumId: action.albumId,
-    itemData: action.itemData,
-    itemDataHash: action.itemDataHash,
-    itemMetadata: action.itemMetadata,
-    itemMetadataHash: action.itemMetadataHash,
-    jwt: jwtoken,
-  });
+    const resp = yield ipc.callMain(ipcConstants.GET_ENCRYPTED_METADATA, {
+      metadata: action.itemMetadata,
+      muk: mukObj,
+    });
 
-  console.log(result);
+    if (resp.error) {
+      console.error('Unable to encrypt metadata.')
+      throw Error("Unable to encrypt!!");
+    }
+
+    const jwtoken = yield select(getJWToken);
+
+    const result = yield postItem({
+      albumId: action.albumId,
+      itemData: action.itemData,
+      itemDataHash: action.itemDataHash,
+      itemMetadata: resp.data.metadata,
+      itemMetadataHash: resp.data.metadataHash,
+      jwt: jwtoken,
+    });
+
+    console.log('post item result: ', result)
+
+    // fire action that notifies
+
+    // clear form / close modal 
+    yield put(postItemSuccess({}));
+    yield put(changePhotoModalState({ newState: false }));
+  } catch (error) {
+    console.error('Unable to post new item: ', error);
+    yield put(postItemFailure({}));
+  }
 }
 
 export function* watchPostItem() {

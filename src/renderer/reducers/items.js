@@ -17,6 +17,14 @@ const items = (state = baseState, action) => {
           return prev;
         }, {}),
       });
+    case itemConstants.SET_ITEMS:
+      return Object.assign({}, state, {
+        itemIds: action.items.map(obj => obj.id),
+        items: action.items.reduce((prev, next) => {
+          prev[next.id] = next;
+          return prev;
+        }, {}),
+      });
     default:
       return state;
   }

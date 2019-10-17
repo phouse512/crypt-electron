@@ -22,7 +22,7 @@ const AddPhotoModal = ({
         albumId: 1,
         itemData: values.photoField.image,
         itemDataHash: values.photoField.encImageHash,
-        itemMetadata: "",
+        itemMetadata: values.metadata,
         itemMetadataHash: "",
       })}
     />

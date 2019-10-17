@@ -9,7 +9,8 @@ export default class FieldMetadataInput extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.addField = this.addField.bind(this);
     this.state = {
-      data: [{ key: 'name', value: ''}],
+      count: 1,
+      data: {key1: '', value1: ''},
     };
   }
 
@@ -21,37 +22,55 @@ export default class FieldMetadataInput extends React.Component {
     return resp;
   }
 
-  async onChange(e) {
+  onChange(key, val) {
     const { input: { onChange } } = this.props;
-    console.log(e);
+    const updatedObj = {};
+    updatedObj[key] = val.target.value;
+    this.setState({
+      data: Object.assign({}, this.state.data, updatedObj),
+    }, () => {
+      onChange(this.state.data);
+    });
   }
 
   addField() {
-    const existingData = this.state.data;
-    existingData.push({key: '', value: ''});
-    this.setState({ data: existingData });
+    const newCount = this.state.count + 1;
+    const newObj = {};
+    newObj[`key${newCount}`] = '';
+    newObj[`value${newCount}`] = '';
+    this.setState({ 
+      count: newCount,
+      data: Object.assign({}, this.state.data, newObj),
+    });
   }
 
   render() {
+    let contents = [];
+    for (var i=1; i <= this.state.count; i++) {
+      const keyKey = `key${i}`;
+      const valueKey = `value${i}`;
+      contents.push(
+        <div>
+          <input
+            onChange={(e) => this.onChange(keyKey, e)}
+            type='text'
+            value={this.state.data[keyKey]}
+          />
+          <input
+            onChange={(e) => this.onChange(valueKey, e)}
+            type='text'
+            value={this.state.data[valueKey]}
+          />        
+        </div>
+      );
+    }
+
     const { input, label, required, meta, } = this.props;
     return (
       <div>
         <label>{label}</label>
         <div>
-          {this.state.data.map((item, key) => {
-            return (
-              <div>
-                <input
-                  onChange={this.onChange}
-                  type='text'
-                />
-                <input
-                  onChange={this.onChange}
-                  type='text'
-                />
-              </div>
-            );
-          })}
+          {contents}
           <div
             onClick={this.addField}
           >Add Keypair</div>
