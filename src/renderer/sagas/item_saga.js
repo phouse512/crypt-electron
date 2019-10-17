@@ -11,6 +11,7 @@ import { changePhotoModalState } from '../actions/views.actions';
 import { itemConstants } from '../constants';
 import { listAlbums, listItems, postItem } from '../api/items';
 import ipcConstants from '../../constants/ipc';
+import { getM } from '../../main/srp';
 
 export const getJWToken = (state) => state.login.jwtData.encoded_token;
 export const getMukObj = (state) => state.login.mukData;
@@ -29,6 +30,7 @@ function* fetchAlbumSaga(action) {
 
 function* fetchItems(action) {
   const jwtoken = yield select(getJWToken);
+  const mukObj = yield select(getMukObj);
 
   const result = yield listItems({
     albumId: action.albumId,
@@ -36,6 +38,11 @@ function* fetchItems(action) {
   });
 
   yield put(setItems({ items: result.data.items }));
+  const resp = yield ipc.callMain(ipcConstants.LOAD_ENCRYPTED_PHOTOS, {
+    items: result.data.items,
+    muk: mukObj,
+  });
+  console.log(resp);
 }
 
 function* postItemSaga(action) {

@@ -1,14 +1,15 @@
 const { app, BrowserWindow} = require('electron');
 require('./ipc');
 
+import storageConstants from '../constants/storage';
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 let mainWindow;
 
-const ENC_PHOTO_DIR = `${app.getPath('userData')}/enc_photos`;
-const PHOTO_DIR = `${app.getPath('userData')}/unenc_photos`;
+const ENC_PHOTO_DIR = `${app.getPath('userData')}/${storageConstants.ENC_PHOTO_DIR}`;
+const PHOTO_DIR = `${app.getPath('userData')}/${storageConstants.UNENC_PHOTO_DIR}`;
 
 const setupDirs = (dirName) => {
   if (!fs.existsSync(dirName)) {

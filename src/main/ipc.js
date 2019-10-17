@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const ipc = require('electron-better-ipc');
 import { SHA3 } from 'sha3';
 import fs from 'fs';
+import fetch from 'node-fetch';
 
 import ipcConstants from '../constants/ipc';
 import userConfig from '../constants/storage';
@@ -17,6 +18,13 @@ import {
 import { genA, getHAMK, getk, getK, getM, getS, getu } from './srp';
 import params from './srpParams'
 import { generateCredentials } from './ipcHandler';
+
+import {
+  getImagePath,
+  imageExists,
+  storeEncImage,
+  storeUnencImage,
+} from './storage';
 
 ipc.answerRenderer(ipcConstants.DEBUG_SRP, async data => {
   // get output path
@@ -315,13 +323,43 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
 ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
   try {
     // loop through images
+    console.log(data);
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
+    const imageMap = {};
+    let cacheHits = 0;
     for (var i=0; i < data.items.length; i++) {
-      console.log(data.item[i]);
+      const item = data.items[i];
+      // check if image exists in unenc cache
+      const exists = imageExists(item.id);
+      let encImageBuffer;
+      if (!exists) {
+        // download image (and save)
+        encImageBuffer = await fetch(item.signed_url)
+          .then(res => res.buffer())
+        storeEncImage(encImageBuffer, item.id);
+      } else {
+        // load encrypted image
+        encImageBuffer = fs.readFileSync(getImagePath(item.id));
+        cacheHits += 1;
+      }
+      // unencrypt buffer
+      const decImageBuffer = decrypt(data.muk.alg, mukBuffer, encImageBuffer);
+      const unencPath = storeUnencImage(decImageBuffer, item.id);
+      imageMap[item.id] = {
+        imagePath: unencPath,
+      };
+
+      // write to unenc dir and 
+
+      // if not download images, unenc, write to 
     }
 
     return {
       error: false,
-      data: {},
+      data: {
+        image: imageMap,
+        cacheHits,
+      },
     };
     // download each image 
 
