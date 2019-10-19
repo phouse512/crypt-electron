@@ -84,7 +84,7 @@ DashboardContainer.propTypes = {};
 
 const mapStateToProps = (state) => ({
   albums: state.items.albumIds.map(id => state.items.albums[id]),
-  items: state.items.itemIds.map(id => state.items.itemIds[id]),
+  items: state.items.itemIds.map(id => state.items.items[id]),
   mukObj: state.login.mukData,
   views: state.views,
 });

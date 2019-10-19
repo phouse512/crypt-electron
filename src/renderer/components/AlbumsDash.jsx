@@ -16,6 +16,7 @@ const AlbumsDash = ({
         <Album
           goToAlbum={goToAlbum}
           id={album.id}
+          key={album.id}
           name={album.name}
           size={album.album_size}
         />

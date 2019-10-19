@@ -346,7 +346,7 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
       const decImageBuffer = decrypt(data.muk.alg, mukBuffer, encImageBuffer);
       const unencPath = storeUnencImage(decImageBuffer, item.id);
       imageMap[item.id] = {
-        imagePath: unencPath,
+        itemPath: unencPath,
       };
 
       // write to unenc dir and 
@@ -357,7 +357,7 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
     return {
       error: false,
       data: {
-        image: imageMap,
+        items: imageMap,
         cacheHits,
       },
     };

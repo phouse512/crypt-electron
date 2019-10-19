@@ -12,6 +12,7 @@ module.exports = {
     'babel-polyfill', 
     path.join(paths.SRC, 'renderer/index.jsx'), 
   ],
+  mode: 'development',
   output: {
     path: paths.DIST,
     filename: 'app.bundle.js',

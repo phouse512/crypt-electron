@@ -19,6 +19,11 @@ export const setItems = ({ items }) => ({
   items,
 });
 
+export const setItemsPaths = ({ itemMap }) => ({
+  type: itemConstants.SET_ITEMS_PATHS,
+  itemMap,
+});
+
 export const postItemRequest = ({
   albumId,
   itemData,

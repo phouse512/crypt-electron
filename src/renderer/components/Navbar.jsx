@@ -14,7 +14,7 @@ const Navbar = ({
         onClick={() => changeView(viewsEnum.ALBUMS)}
       >
         <div>
-          <i class="fas fa-layer-group"></i>
+          <i className="fas fa-layer-group"></i>
         </div>
       </div>
       <div 
@@ -22,7 +22,7 @@ const Navbar = ({
         onClick={() => changeView(viewsEnum.PHOTOS)}
       >
         <div>
-          <i class="far fa-image"></i>
+          <i className="far fa-image"></i>
         </div>
       </div>
       <div
@@ -30,7 +30,7 @@ const Navbar = ({
         onClick={() => changeView(viewsEnum.MANAGE)}
       >
         <div>
-          <i class="fas fa-tools"></i>
+          <i className="fas fa-tools"></i>
         </div>
       </div>
     </div>

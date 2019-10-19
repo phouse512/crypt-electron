@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { paramsToFilters } from './helpers';
 
+import ItemCard from './photos/ItemCard';
 import PhotoFilters from './photos/PhotoFilters';
-
 
 const PhotosDash = ({
   params,
@@ -15,10 +15,20 @@ const PhotosDash = ({
   if (photos.length < 1) {
     photoRender = <div className="photo-collection">No photos exist.</div>
   } else {
-    photoRender = <div className="photo-collection">
-      PHOTOS
-    </div>
+    photoRender = (
+      <div className="photo-collection">
+        {
+          photos.map((item, idx) => (
+            <ItemCard
+              item={item}
+              key={item.id}
+            />
+          ))
+        }
+      </div>
+    );
   }
+
   return (
     <div className="photo-dash">
       <PhotoFilters
@@ -27,7 +37,7 @@ const PhotosDash = ({
       />
       {photoRender}
       <div className="photo-management">
-        manage photos here
+        Add photos here.
       </div>
     </div>
   );
@@ -35,8 +45,22 @@ const PhotosDash = ({
 
 PhotosDash.defaultProps = {};
 PhotosDash.PropTypes = {
-  params: PropTypes.shape({}).isRequired,
-  photos: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  params: PropTypes.shape({
+    album_id: PropTypes.number,
+    hash: PropTypes.string,
+    id: PropTypes.number,
+    itemPath: PropTypes.string,
+    size: PropTypes.number,
+    uploaded_at: PropTypes.number,
+  }).isRequired,
+  photos: PropTypes.arrayOf(PropTypes.shape({
+    album_id: PropTypes.number,
+    hash: PropTypes.string,
+    id: PropTypes.number,
+    itemPath: PropTypes.string,
+    size: PropTypes.number,
+    uploaded_at: PropTypes.number,
+  })).isRequired,
   removePhotoFilter: PropTypes.func.isRequired,
 };
 

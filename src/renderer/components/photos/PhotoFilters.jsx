@@ -8,12 +8,15 @@ const PhotoFilters = ({
   return (
     <div className="photo-filters">
       <div className="">Filters</div>
-      {filters.map(filterObj => (
-        <div className="photo-filters__card">
+      {filters.map((filterObj, idx) => (
+        <div 
+          className="photo-filters__card"
+          key={idx}
+        >
           {filterObj.type} - {filterObj.value}
           <span
             onClick={() => removeFilter(filterObj.type, filterObj.value)}
-          ><i class="fas fa-times"></i></span>
+          ><i className="fas fa-times"></i></span>
         </div>
       ))}
     </div>

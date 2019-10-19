@@ -5,7 +5,8 @@ import {
   postItemFailure,
   postItemSuccess,
   setAlbums, 
-  setItems
+  setItems,
+  setItemsPaths,
 } from '../actions/items.actions';
 import { changePhotoModalState } from '../actions/views.actions';
 import { itemConstants } from '../constants';
@@ -42,7 +43,8 @@ function* fetchItems(action) {
     items: result.data.items,
     muk: mukObj,
   });
-  console.log(resp);
+
+  yield put(setItemsPaths({ itemMap: resp.data.items }));
 }
 
 function* postItemSaga(action) {

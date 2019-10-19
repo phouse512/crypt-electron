@@ -29,9 +29,27 @@
 }
 
 .photo-collection {
+  align-items: center;
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   padding: $sm-margin;
-  width: 100%;
+
+  .item-card {
+    border-radius: 3px;
+    margin: $sm-margin;
+    max-height: 100px;
+    max-width: 100px;
+    min-height: 100px;
+    min-width: 100px;
+    background-color: green;
+
+    img {
+      max-height: 100%;
+      max-width: 100%;
+    }
+  }
 }
 
 .photo-management {
