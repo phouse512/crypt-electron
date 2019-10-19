@@ -1,0 +1,60 @@
+.photo-dash {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-start;
+
+  .photo-filters {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: $sm-padding;
+    padding-top: $sm-padding;
+
+    div:first-child {
+      padding: $sm-margin;
+    }
+
+    &__card {
+      background-color: $grey-light;
+      border-radius: 5px;
+      min-height: 20px;
+      padding: $sm-margin;
+
+      & span {
+        cursor: pointer;
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
+.photo-collection {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: $sm-margin;
+
+  .item-card {
+    border-radius: 3px;
+    margin: $sm-margin;
+    max-height: 100px;
+    max-width: 100px;
+    min-height: 100px;
+    min-width: 100px;
+    overflow: hidden;
+    background-color: green;
+
+    img {
+      max-height: 100%;
+      max-width: 100%;
+    }
+  }
+}
+
+.photo-management {
+  height: 100px;
+  margin-top: auto;
+  width: 100%;
+}

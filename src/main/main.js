@@ -1,11 +1,25 @@
 const { app, BrowserWindow} = require('electron');
 require('./ipc');
-const path = require('path');
+
+import storageConstants from '../constants/storage';
+const fs = require('fs');
 const os = require('os');
+const path = require('path');
 
 let mainWindow;
 
-console.log('STARTING UP');
+const ENC_PHOTO_DIR = `${app.getPath('userData')}/${storageConstants.ENC_PHOTO_DIR}`;
+const PHOTO_DIR = `${app.getPath('userData')}/${storageConstants.UNENC_PHOTO_DIR}`;
+
+const setupDirs = (dirName) => {
+  if (!fs.existsSync(dirName)) {
+    fs.mkdirSync(dirName);
+  }
+};
+
+console.log('Initializing crypt..');
+setupDirs(ENC_PHOTO_DIR);
+setupDirs(PHOTO_DIR);
 
 function createWindow() {
   mainWindow = new BrowserWindow({

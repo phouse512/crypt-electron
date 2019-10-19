@@ -3,6 +3,7 @@ import { viewConstants, viewsEnum } from '../constants';
 const baseState = {
   currentView: viewsEnum.ALBUMS,
   params: {},
+  photoModalState: false,
 };
 
 const views = (state = baseState, action) => {
@@ -10,6 +11,30 @@ const views = (state = baseState, action) => {
     case viewConstants.SET_VIEW:
       return Object.assign({}, state, {
         currentView: action.view,
+        params: {
+          ...state.params,
+          ...action.params,
+        },
+      });
+    case viewConstants.REMOVE_PHOTO_FILTER:
+      // check if type exists
+      if (!state.params.hasOwnProperty(action.filter)) {
+        return Object.assign({}, state, {});
+      }
+
+      // if does, see if value
+      const index = state.params[action.filter].indexOf(action.value);
+      if (index < 0) {
+        return Object.assign({}, state, {});
+      }
+
+      state.params[action.filter].splice(index);
+      return Object.assign({}, state, {
+        params: state.params,
+      });
+    case viewConstants.CHANGE_PHOTO_MODAL_STATE:
+      return Object.assign({}, state, {
+        photoModalState: action.newState,
       });
     default:
       return state;

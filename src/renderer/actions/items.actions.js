@@ -18,3 +18,31 @@ export const setItems = ({ items }) => ({
   type: itemConstants.SET_ITEMS,
   items,
 });
+
+export const setItemsPaths = ({ itemMap }) => ({
+  type: itemConstants.SET_ITEMS_PATHS,
+  itemMap,
+});
+
+export const postItemRequest = ({
+  albumId,
+  itemData,
+  itemDataHash,
+  itemMetadata,
+  itemMetadataHash,
+}) => ({
+  type: itemConstants.POST_ITEM_REQUEST,
+  albumId,
+  itemData,
+  itemDataHash,
+  itemMetadata,
+  itemMetadataHash,
+});
+
+export const postItemSuccess = ({}) => ({
+  type: itemConstants.POST_ITEM_SUCCESS,
+});
+
+export const postItemFailure = ({}) => ({
+  type: itemConstants.POST_ITEM_FAILURE,
+});

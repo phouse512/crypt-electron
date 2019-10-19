@@ -1,0 +1,22 @@
+.search-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  min-height: 50px;
+  padding: $sm-padding;
+}
+
+.search-section {
+  background-color: red;
+}
+
+.shortcut-bar {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  font-size: $icon-size-lg;
+
+  i {
+    cursor: pointer;
+  }
+}
