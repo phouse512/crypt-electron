@@ -10,10 +10,20 @@ const SearchBar = ({
         Searchity Search
       </div>
       <div className="shortcut-bar">
-        <i 
-          className="far fa-plus-square"
-          onClick={() => openPhotoModal()}
-        />
+        <div className="shortcut-bar__button">
+          <i
+            className="far fa-plus-square"
+            // onClick={() => openPhotoModal()}
+          />
+        </div>
+        <div className="shortcut-bar__content">
+          <div
+            onClick={() => openPhotoModal()}
+          >
+            Add Photo
+          </div>
+          <div>Add Album</div>
+        </div>
       </div>
     </div>
   );
