@@ -16,3 +16,8 @@ export const changePhotoModalState = ({ newState }) => ({
   type: viewConstants.CHANGE_PHOTO_MODAL_STATE,
   newState,
 });
+
+export const changeAlbumModalState = ({ newState }) => ({
+  type: viewConstants.CHANGE_ALBUM_MODAL_STATE,
+  newState,
+});

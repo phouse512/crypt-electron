@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const SearchBar = ({
+  openAlbumModal,
   openPhotoModal,
 }) => {
   return (
@@ -13,7 +14,6 @@ const SearchBar = ({
         <div className="shortcut-bar__button">
           <i
             className="far fa-plus-square"
-            // onClick={() => openPhotoModal()}
           />
         </div>
         <div className="shortcut-bar__content">
@@ -22,7 +22,11 @@ const SearchBar = ({
           >
             Add Photo
           </div>
-          <div>Add Album</div>
+          <div
+            onClick={() => openAlbumModal()}
+          >
+            Add Album
+          </div>
         </div>
       </div>
     </div>
@@ -31,6 +35,7 @@ const SearchBar = ({
 
 SearchBar.defaultProps = {};
 SearchBar.PropTypes = {
+  openAlbumModal: PropTypes.func.isRequired,
   openPhotoModal: PropTypes.func.isRequired,
 };
 
