@@ -50,7 +50,9 @@ export default class FieldMetadataInput extends React.Component {
       const keyKey = `key${i}`;
       const valueKey = `value${i}`;
       contents.push(
-        <div>
+        <div
+          key={keyKey}
+        >
           <input
             onChange={(e) => this.onChange(keyKey, e)}
             type='text'

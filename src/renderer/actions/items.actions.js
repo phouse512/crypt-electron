@@ -1,7 +1,8 @@
 import { itemConstants } from '../constants';
 
-export const fetchAlbums = () => ({
+export const fetchAlbums = ({ fetchItems = false }) => ({
   type: itemConstants.FETCH_ALBUMS_REQUEST,
+  fetchItems,
 });
 
 export const fetchItems = ({ albumId }) => ({

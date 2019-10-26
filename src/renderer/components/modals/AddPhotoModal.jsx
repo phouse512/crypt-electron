@@ -5,6 +5,7 @@ import ReactModal from 'react-modal';
 import AddPhotoForm from '../forms/AddPhotoForm';
 
 const AddPhotoModal = ({
+  albums,
   closeHandler,
   isOpen,
   mukObj,
@@ -17,9 +18,10 @@ const AddPhotoModal = ({
     onRequestClose={closeHandler}
   >
     <AddPhotoForm
+      albums={albums}
       mukObj={mukObj}
       onSubmit={values => saveImageRequest({
-        albumId: 1,
+        albumId: parseInt(values.album, 10),
         itemData: values.photoField.image,
         itemDataHash: values.photoField.encImageHash,
         itemMetadata: values.metadata,
@@ -31,6 +33,10 @@ const AddPhotoModal = ({
 
 AddPhotoModal.defaultProps = {};
 AddPhotoModal.PropTypes = {
+  albums: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+  })).isRequired,
   closeHandler: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
   mukObj: PropTypes.shape({}).isRequired,
