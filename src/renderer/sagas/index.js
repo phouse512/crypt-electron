@@ -10,5 +10,6 @@ export {
 export {
   watchFetchAlbums,
   watchFetchItems,
+  watchPostAlbum,
   watchPostItem,
 } from './item_saga';

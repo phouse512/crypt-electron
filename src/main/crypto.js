@@ -2,6 +2,7 @@ const assert = require('assert').strict;
 const crypto = require('crypto');
 const hkdf = require('futoin-hkdf');
 const xor = require('buffer-xor');
+import uuidv4 from 'uuid/v4';
 
 import params, { hexToBigInt } from './srpParams';
 import { computeVerifier, getSrpX } from './srp';
@@ -217,4 +218,20 @@ export const generateSalt = () => {
   const buf = Buffer.alloc(16);
   crypto.randomFillSync(buf, 0, 16);
   return buf;
+};
+
+/*
+ * generates 32 byte encyrption key for aes256
+ */
+export const generateAES256KeySet = () => {
+  const vaultKey = Buffer.alloc(32);
+  crypto.randomFillSync(vaultKey);
+
+  return {
+    alg: 'A256GCM',
+    k: vaultKey.toString('base64'),
+    keyOps: ['decrypt', 'encrypt'],
+    kty: 'oct',
+    kid: uuidv4(),
+  };
 };

@@ -24,6 +24,20 @@ export const setItemsPaths = ({ itemMap }) => ({
   itemMap,
 });
 
+export const postAlbumRequest = ({ description, name }) => ({
+  type: itemConstants.POST_ALBUM_REQUEST,
+  description,
+  name,
+});
+
+export const postAlbumSuccess = ({}) => ({
+  type: itemConstants.POST_ALBUM_SUCCESS,
+});
+
+export const postAlbumFailure = ({}) => ({
+  type: itemConstants.POST_ITEM_FAILURE,
+});
+
 export const postItemRequest = ({
   albumId,
   itemData,

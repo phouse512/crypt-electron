@@ -6,14 +6,17 @@ import { viewsEnum } from '../constants';
 import { 
   fetchAlbums, 
   fetchItems,
+  postAlbumRequest,
   postItemRequest,
 } from '../actions/items.actions';
-import { 
+import {
+  changeAlbumModalState,
   changePhotoModalState, 
   changeView, 
   removePhotoFilter,
 } from '../actions/views.actions';
 
+import AddAlbumModal from '../components/modals/AddAlbumModal';
 import AddPhotoModal from '../components/modals/AddPhotoModal';
 import AlbumsDash from '../components/AlbumsDash';
 import ManageDash from '../components/ManageDash';
@@ -64,6 +67,7 @@ export class DashboardContainer extends React.Component {
         </div>
         <div className="app-body">
           <SearchBar
+            openAlbumModal={() => this.props.changeAlbumModal(true)}
             openPhotoModal={() => this.props.changePhotoModal(true)}
           />
           {viewComponent}
@@ -74,6 +78,12 @@ export class DashboardContainer extends React.Component {
           mukObj={this.props.mukObj}
           openHandler={() => console.log('open handler')}
           saveImageRequest={this.props.saveImageRequest}
+        />
+        <AddAlbumModal
+          closeHandler={() => this.props.changeAlbumModal(false)}
+          isOpen={this.props.views.albumModalState}
+          openHandler={() => console.log('album open handler')}
+          saveAlbumRequest={this.props.saveAlbumRequest}
         />
       </div>
     );
@@ -97,8 +107,10 @@ const mapDispatchToProps = dispatch => ({
     params: {album: [albumId]},
     view: viewsEnum.PHOTOS,
   })),
+  changeAlbumModal: (newState) => dispatch(changeAlbumModalState({ newState })),
   changePhotoModal: (newState) => dispatch(changePhotoModalState({ newState })),
   removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
+  saveAlbumRequest: ({ description, name }) => dispatch(postAlbumRequest({ description, name })),
   saveImageRequest: ({ albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash}) => dispatch(postItemRequest({ 
       albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash })),
 });

@@ -1,6 +1,7 @@
 import { viewConstants, viewsEnum } from '../constants';
 
 const baseState = {
+  albumModalState: false,
   currentView: viewsEnum.ALBUMS,
   params: {},
   photoModalState: false,
@@ -35,6 +36,10 @@ const views = (state = baseState, action) => {
     case viewConstants.CHANGE_PHOTO_MODAL_STATE:
       return Object.assign({}, state, {
         photoModalState: action.newState,
+      });
+    case viewConstants.CHANGE_ALBUM_MODAL_STATE:
+      return Object.assign({}, state, {
+        albumModalState: action.newState,
       });
     default:
       return state;
