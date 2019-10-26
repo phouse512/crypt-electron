@@ -16,7 +16,10 @@ const AddAlbumModal = ({
     onRequestClose={closeHandler}
   >
     <AddAlbumForm
-      onSubmit={values => console.log(values)}
+      onSubmit={values => saveAlbumRequest({
+        description: values.description,
+        name: values.name,
+      })}
     />
   </ReactModal>
 );

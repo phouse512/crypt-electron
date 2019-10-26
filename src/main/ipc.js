@@ -12,6 +12,7 @@ import {
   decrypt,
   derivePrivateKeys,
   encrypt,
+  generateAES256KeySet,
   generateSalt, 
   generateSecretKey,
 } from './crypto';
@@ -348,10 +349,6 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
       imageMap[item.id] = {
         itemPath: unencPath,
       };
-
-      // write to unenc dir and 
-
-      // if not download images, unenc, write to 
     }
 
     return {
@@ -360,12 +357,48 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
         items: imageMap,
         cacheHits,
       },
-    };
-    // download each image 
-
-    // send event    
+    };  
   } catch (error) {
     console.error('unable to load photos: ', err);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});
+
+ipc.answerRenderer(ipcConstants.CREATE_ALBUM, async data => {
+  try {
+    console.log('made it')
+    console.log(data);
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
+
+    // generate aes vault key // CREATE KEYSET
+    const newKeyset = generateAES256KeySet();
+    const keysetJson = JSON.stringify(newKeyset)
+    console.log(keysetJson);
+    // encrypt with muk
+    const encryptedVaultKey = encrypt(
+      data.muk.alg, 
+      mukBuffer,
+      Buffer.from(keysetJson, 'utf-8'),
+    );
+
+    // return encrypted vault key, encrypted name/desc
+    const vaultKeyBuf = Buffer.from(newKeyset.k, 'base64');
+    const encName = encrypt(newKeyset.alg, vaultKeyBuf, Buffer.from(data.name, 'utf-8'));
+    const encDesc = encrypt(newKeyset.alg, vaultKeyBuf, Buffer.from(data.description, 'utf-8'));
+
+    return {
+      error: false,
+      data: {
+        encryptedVaultKey: encryptedVaultKey.toString('base64'),
+        encryptedName: encName.toString('base64'),
+        encryptedDescription: encDesc.toString('base64'),
+      },
+    };
+  } catch (error) {
+    console.error('unable to create album: ', error);
     return {
       error: true,
       data: {},

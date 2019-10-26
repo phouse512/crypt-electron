@@ -2,15 +2,22 @@ import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
 const ipc = require('electron-better-ipc');
 
 import {
+  postAlbumFailure,
+  postAlbumSuccess,
   postItemFailure,
   postItemSuccess,
   setAlbums, 
   setItems,
   setItemsPaths,
 } from '../actions/items.actions';
-import { changePhotoModalState } from '../actions/views.actions';
+import { changeAlbumModalState, changePhotoModalState } from '../actions/views.actions';
 import { itemConstants } from '../constants';
-import { listAlbums, listItems, postItem } from '../api/items';
+import {
+  listAlbums,
+  listItems,
+  postAlbum,
+  postItem,
+} from '../api/items';
 import ipcConstants from '../../constants/ipc';
 import { getM } from '../../main/srp';
 
@@ -45,6 +52,40 @@ function* fetchItems(action) {
   });
 
   yield put(setItemsPaths({ itemMap: resp.data.items }));
+}
+
+function* postAlbumSaga(action) {
+  try {
+    // get encrypted name, desc
+    const mukObj = yield select(getMukObj);
+
+    const resp = yield ipc.callMain(ipcConstants.CREATE_ALBUM, {
+      description: action.description,
+      muk: mukObj,
+      name: action.name,
+    });
+
+    if (resp.error) {
+      console.error('unable to generate album');
+      return;
+    }
+    // make api call
+    const jwtoken = yield select(getJWToken);
+    const result = yield postAlbum({
+      description: resp.data.encryptedDescription,
+      encryptedVaultKey: resp.data.encryptedVaultKey,
+      jwt: jwtoken,
+      name: resp.data.encryptedName,
+    });
+
+    console.log('post album result: ', result);
+
+    yield put(postAlbumSuccess({}));
+    yield put(changeAlbumModalState({ newState: false }));
+  } catch (error) {
+    console.error('There is an error: ', error);
+    // handle later
+  }
 }
 
 function* postItemSaga(action) {
@@ -84,6 +125,10 @@ function* postItemSaga(action) {
     console.error('Unable to post new item: ', error);
     yield put(postItemFailure({}));
   }
+}
+
+export function* watchPostAlbum() {
+  yield takeLatest(itemConstants.POST_ALBUM_REQUEST, postAlbumSaga);
 }
 
 export function* watchPostItem() {

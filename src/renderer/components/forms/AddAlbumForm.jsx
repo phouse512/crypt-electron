@@ -24,6 +24,7 @@ const AddAlbumForm = props => {
           type="text"
         />
       </div>
+      <button type="submit">Add</button>
     </form>
   );
 };

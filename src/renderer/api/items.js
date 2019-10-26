@@ -1,6 +1,7 @@
 const url = require('url');
 import { urlConstants } from '../constants';
 import { queryParams } from './util';
+import { encrypt } from '../../main/crypto';
 
 export const listAlbums = ({ jwt }) => {
   const url = `${urlConstants.BASE_URL}/album`;
@@ -25,6 +26,33 @@ export const listItems = ({ albumId, jwt }) => {
     headers: new Headers({
       'crypt-api-key': `Bearer ${jwt}`,
     }),
+  });
+
+  return fetch(request).then(resp => {
+    return resp.json();
+  }).catch(err => {
+    throw new Error('Unable to fetch items with error: ' + err);
+  });
+};
+
+export const postAlbum = ({
+  description,
+  encryptedVaultKey,
+  jwt,
+  name,
+}) => {
+  const body = {
+    description,
+    encrypted_vault_key: encryptedVaultKey,
+    name,
+  };
+  const url = `${urlConstants.BASE_URL}/album`;
+  const request = new Request(url, {
+    body: JSON.stringify(body),
+    headers: new Headers({
+      'crypt-api-key': `Bearer ${jwt}`,
+    }),
+    method: 'POST',
   });
 
   return fetch(request).then(resp => {

@@ -6,6 +6,7 @@ import { viewsEnum } from '../constants';
 import { 
   fetchAlbums, 
   fetchItems,
+  postAlbumRequest,
   postItemRequest,
 } from '../actions/items.actions';
 import {
@@ -82,7 +83,7 @@ export class DashboardContainer extends React.Component {
           closeHandler={() => this.props.changeAlbumModal(false)}
           isOpen={this.props.views.albumModalState}
           openHandler={() => console.log('album open handler')}
-          saveAlbumRequest={(values) => console.log('save album: ', values)}
+          saveAlbumRequest={this.props.saveAlbumRequest}
         />
       </div>
     );
@@ -109,6 +110,7 @@ const mapDispatchToProps = dispatch => ({
   changeAlbumModal: (newState) => dispatch(changeAlbumModalState({ newState })),
   changePhotoModal: (newState) => dispatch(changePhotoModalState({ newState })),
   removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
+  saveAlbumRequest: ({ description, name }) => dispatch(postAlbumRequest({ description, name })),
   saveImageRequest: ({ albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash}) => dispatch(postItemRequest({ 
       albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash })),
 });
