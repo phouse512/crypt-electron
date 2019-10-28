@@ -33,6 +33,15 @@ const items = (state = baseState, action) => {
           return prev;
         }, {}),
       });
+    case itemConstants.SET_ALBUM_DETAILS:
+      console.log(action);
+      return Object.assign({}, state, {
+        albums: state.albumIds.reduce((prev, next) => {
+          const existing = state.albums[next];
+          prev[next] = Object.assign({}, existing, action.albumMap[next]);
+          return prev;
+        }, {}),
+      });
     default:
       return state;
   }

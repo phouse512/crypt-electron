@@ -8,7 +8,8 @@ import {
   postAlbumSuccess,
   postItemFailure,
   postItemSuccess,
-  setAlbums, 
+  setAlbums,
+  setAlbumDetails,
   setItems,
   setItemsPaths,
 } from '../actions/items.actions';
@@ -44,6 +45,12 @@ function* fetchAlbumSaga(action) {
         yield put(fetchItems({ albumId: result.data.albums[i].id }));
       }
     }
+    const mukObj = yield select(getMukObj);
+    const albumResp = yield ipc.callMain(ipcConstants.DECRYPT_ALBUM_DETAILS, {
+      albums: result.data.albums,
+      muk: mukObj,
+    });
+    yield put(setAlbumDetails({ albumMap: albumResp.data.albumMap }));
   } catch (error) {
     console.error('Unable to fetch items.');
     console.error(error);

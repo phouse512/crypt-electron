@@ -61,3 +61,8 @@ export const postItemSuccess = ({}) => ({
 export const postItemFailure = ({}) => ({
   type: itemConstants.POST_ITEM_FAILURE,
 });
+
+export const setAlbumDetails = ({ albumMap }) => ({
+  type: itemConstants.SET_ALBUM_DETAILS,
+  albumMap,
+});

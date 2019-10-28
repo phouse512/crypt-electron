@@ -14,6 +14,7 @@ const AlbumsDash = ({
     albumRender = <div className="album-collection">
       {albums.map(album => (
         <Album
+          decryptedName={album.decryptedName}
           goToAlbum={goToAlbum}
           id={album.id}
           key={album.id}
