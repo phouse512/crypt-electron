@@ -376,7 +376,7 @@ ipc.answerRenderer(ipcConstants.CREATE_ALBUM, async data => {
     // generate aes vault key // CREATE KEYSET
     const newKeyset = generateAES256KeySet();
     const keysetJson = JSON.stringify(newKeyset)
-    console.log(keysetJson);
+
     // encrypt with muk
     const encryptedVaultKey = encrypt(
       data.muk.alg, 
@@ -405,3 +405,51 @@ ipc.answerRenderer(ipcConstants.CREATE_ALBUM, async data => {
     };
   }
 });
+
+ipc.answerRenderer(ipcConstants.DECRYPT_ALBUM_DETAILS, async data => {
+  try {
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
+    const albumMap = {};
+    // loop through albums
+    for (var i=0; i < data.albums.length; i++) {
+      // decrypt encrypted vault key
+      const album = data.albums[i];
+      const decVaultKey = decrypt(
+        data.muk.alg, 
+        mukBuffer, 
+        Buffer.from(album.encrypted_vault_key, 'base64'),
+      );
+      
+      const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+      const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+      const decName = decrypt(
+        vaultKeyset.alg,
+        vaultKeyBuf,
+        Buffer.from(album.name, 'base64'),
+      ).toString('utf-8');
+      const decDesc = decrypt(
+        vaultKeyset.alg,
+        vaultKeyBuf,
+        Buffer.from(album.description, 'base64'),
+      ).toString('utf-8');
+      // decrypt name / desc with vault key
+
+      albumMap[album.id] = {
+        decryptedName: decName,
+        decryptedDesc: decDesc,
+      };
+    }
+    return {
+      error: false,
+      data: {
+        albumMap,
+      },
+    };
+  } catch (error) {
+    console.error('unable to decrypt albums: ', error);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+})

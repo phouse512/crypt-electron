@@ -7,6 +7,9 @@ export const itemConstants = {
   SET_ITEMS: 'IC_SET_ITEMS',
   SET_ITEMS_PATHS: 'IC_SET_ITEMS_PATHS',
 
+  // constants around album decryption
+  SET_ALBUM_DETAILS: 'IC_SET_ALBUM_DETAILS',
+
   // constants around creating item
   POST_ITEM_REQUEST: 'IC_POST_ITEM_REQUEST',
   POST_ITEM_SUCCESS: 'IC_POST_ITEM_SUCCESS',

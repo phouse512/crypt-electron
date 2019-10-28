@@ -28,10 +28,7 @@ import SearchBar from '../components/SearchBar';
 export class DashboardContainer extends React.Component {
   componentWillMount() {
     // fetch albums
-
-    // fetch items]
-    this.props.fetchAlbums();
-    this.props.fetchItems(1);
+    this.props.fetchAlbums(true);
   }
 
   render() {
@@ -73,6 +70,7 @@ export class DashboardContainer extends React.Component {
           {viewComponent}
         </div>
         <AddPhotoModal
+          albums={this.props.albums}
           closeHandler={() => this.props.changePhotoModal(false)}
           isOpen={this.props.views.photoModalState}
           mukObj={this.props.mukObj}
@@ -101,7 +99,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   changeView: (view) => dispatch(changeView({ view })),
-  fetchAlbums: () => dispatch(fetchAlbums()),
+  fetchAlbums: (fetchItems) => dispatch(fetchAlbums({ fetchItems })),
   fetchItems: (albumId) => dispatch(fetchItems({ albumId })),
   goToAlbum: (albumId) => dispatch(changeView({
     params: {album: [albumId]},

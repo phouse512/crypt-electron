@@ -2,11 +2,14 @@ import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
 const ipc = require('electron-better-ipc');
 
 import {
+  fetchAlbums,
+  fetchItems,
   postAlbumFailure,
   postAlbumSuccess,
   postItemFailure,
   postItemSuccess,
-  setAlbums, 
+  setAlbums,
+  setAlbumDetails,
   setItems,
   setItemsPaths,
 } from '../actions/items.actions';
@@ -25,18 +28,36 @@ export const getJWToken = (state) => state.login.jwtData.encoded_token;
 export const getMukObj = (state) => state.login.mukData;
 
 function* fetchAlbumSaga(action) {
-  console.log('fetching albums with action: ', action);
-  const jwtoken = yield select(getJWToken);
+  try {
+    console.log('fetching albums with action: ', action);
+    const jwtoken = yield select(getJWToken);
 
-  const result = yield listAlbums({
-    jwt: jwtoken,
-  });
-  yield put(setAlbums({
-    albums: result.data.albums,
-  }));
+    const result = yield listAlbums({
+      jwt: jwtoken,
+    });
+    yield put(setAlbums({
+      albums: result.data.albums,
+    }));
+
+    if (action.fetchItems) {
+      console.log('am i inside');
+      for (var i=0; i<result.data.albums.length; i++) {
+        yield put(fetchItems({ albumId: result.data.albums[i].id }));
+      }
+    }
+    const mukObj = yield select(getMukObj);
+    const albumResp = yield ipc.callMain(ipcConstants.DECRYPT_ALBUM_DETAILS, {
+      albums: result.data.albums,
+      muk: mukObj,
+    });
+    yield put(setAlbumDetails({ albumMap: albumResp.data.albumMap }));
+  } catch (error) {
+    console.error('Unable to fetch items.');
+    console.error(error);
+  }
 }
 
-function* fetchItems(action) {
+function* fetchItemsSaga(action) {
   const jwtoken = yield select(getJWToken);
   const mukObj = yield select(getMukObj);
 
@@ -82,6 +103,7 @@ function* postAlbumSaga(action) {
 
     yield put(postAlbumSuccess({}));
     yield put(changeAlbumModalState({ newState: false }));
+    yield put(fetchAlbums());
   } catch (error) {
     console.error('There is an error: ', error);
     // handle later
@@ -140,5 +162,5 @@ export function* watchFetchAlbums() {
 }
 
 export function* watchFetchItems() {
-  yield takeLatest(itemConstants.FETCH_ITEMS_REQUEST, fetchItems);
+  yield takeLatest(itemConstants.FETCH_ITEMS_REQUEST, fetchItemsSaga);
 }
