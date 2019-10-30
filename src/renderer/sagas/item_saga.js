@@ -162,5 +162,5 @@ export function* watchFetchAlbums() {
 }
 
 export function* watchFetchItems() {
-  yield takeLatest(itemConstants.FETCH_ITEMS_REQUEST, fetchItemsSaga);
+  yield takeEvery(itemConstants.FETCH_ITEMS_REQUEST, fetchItemsSaga);
 }

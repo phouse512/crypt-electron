@@ -45,6 +45,7 @@ export class DashboardContainer extends React.Component {
         break;
       case viewsEnum.PHOTOS:
         viewComponent = <PhotosDash
+          albums={this.props.albumMap}
           params={this.props.views.params}
           photos={this.props.items}
           removePhotoFilter={this.props.removePhotoFilter}
@@ -92,6 +93,7 @@ DashboardContainer.propTypes = {};
 
 const mapStateToProps = (state) => ({
   albums: state.items.albumIds.map(id => state.items.albums[id]),
+  albumMap: state.items.albums,
   items: state.items.itemIds.map(id => state.items.items[id]),
   mukObj: state.login.mukData,
   views: state.views,

@@ -7,6 +7,7 @@ import ItemCard from './photos/ItemCard';
 import PhotoFilters from './photos/PhotoFilters';
 
 const PhotosDash = ({
+  albums,
   params,
   photos,
   removePhotoFilter,
@@ -33,6 +34,7 @@ const PhotosDash = ({
     <div className="photo-dash">
       <PhotoFilters
         filters={paramsToFilters(params)}
+        filterNames={{album: albums}}
         removeFilter={removePhotoFilter}
       />
       {photoRender}
@@ -45,6 +47,7 @@ const PhotosDash = ({
 
 PhotosDash.defaultProps = {};
 PhotosDash.PropTypes = {
+  albums: PropTypes.shape({}),
   params: PropTypes.shape({
     album_id: PropTypes.number,
     hash: PropTypes.string,

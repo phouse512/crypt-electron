@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const PhotoFilters = ({
   filters,
+  filterNames,
   removeFilter,
 }) => {
   return (
@@ -13,7 +14,7 @@ const PhotoFilters = ({
           className="photo-filters__card"
           key={idx}
         >
-          {filterObj.type} - {filterObj.value}
+          {filterObj.type} - {filterNames[filterObj.type][filterObj.value].decryptedName || 'loading..'}
           <span
             onClick={() => removeFilter(filterObj.type, filterObj.value)}
           ><i className="fas fa-times"></i></span>
@@ -29,6 +30,9 @@ PhotoFilters.PropTypes = {
     type: PropTypes.string,
     value: PropTypes.string,
   })).isRequired,
+  filterNames: PropTypes.shape({
+    album: PropTypes.shape({}), // map of ids -> names
+  }),
   removeFilter: PropTypes.func.isRequired,
 };
 
