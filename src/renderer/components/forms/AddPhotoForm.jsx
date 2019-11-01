@@ -22,7 +22,7 @@ let AddPhotoForm = props => {
                 key={album.id}
                 value={album.id}
               >
-                {album.name}
+                {album.decryptedName || 'loading..'}
               </option>
             ))
           }

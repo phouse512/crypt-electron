@@ -19,11 +19,11 @@ const items = (state = baseState, action) => {
       });
     case itemConstants.SET_ITEMS:
       return Object.assign({}, state, {
-        itemIds: action.items.map(obj => obj.id),
+        itemIds: [...state.itemIds, ...action.items.map(obj => obj.id)],
         items: action.items.reduce((prev, next) => {
           prev[next.id] = next;
           return prev;
-        }, {}),
+        }, state.items),
       });
     case itemConstants.SET_ITEMS_PATHS:
       return Object.assign({}, state, {
