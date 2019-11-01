@@ -6,6 +6,18 @@ import { paramsToFilters } from './helpers';
 import ItemCard from './photos/ItemCard';
 import PhotoFilters from './photos/PhotoFilters';
 
+const filterItems = (items, params) => {
+  // filter by albums
+  let filteredItems = items;
+  if (params.hasOwnProperty('album') && params.album.length > 0) {
+    filteredItems = filteredItems.filter(item => {
+      return params.album.includes(item.album_id);
+    });
+  }
+
+  return filteredItems;
+}
+
 const PhotosDash = ({
   albums,
   params,
@@ -16,10 +28,11 @@ const PhotosDash = ({
   if (photos.length < 1) {
     photoRender = <div className="photo-collection">No photos exist.</div>
   } else {
+    console.log(params);
     photoRender = (
       <div className="photo-collection">
         {
-          photos.map((item, idx) => (
+          filterItems(photos, params).map((item, idx) => (
             <ItemCard
               item={item}
               key={item.id}
