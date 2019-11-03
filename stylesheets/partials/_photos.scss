@@ -60,3 +60,32 @@
   margin-top: auto;
   width: 100%;
 }
+
+.photo-view {
+  display: flex;
+  flex-direction: column;
+
+  &__image {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    justify-content: center;
+    max-height: 100vh;
+    max-width: 100%;
+    padding-left: 5vw;
+    padding-right: 5vw;
+
+    div {
+      img {
+        display: block;
+        margin: auto;
+        max-height: 100%;
+        max-width: 100%;
+      }
+    }
+
+    
+
+  }
+
+}

@@ -3,9 +3,13 @@ import PropTypes from 'prop-types';
 
 const ItemCard = ({
   item,
+  openHandler,
 }) => {
   return (
-    <div className="item-card">
+    <div
+      className="item-card"
+      onClick={() => openHandler(item)}
+    >
       <img
         src={item.itemPath}
       />
@@ -29,6 +33,7 @@ ItemCard.PropTypes = {
     metadata: PropTypes.string.isRequired,
     itemPath: PropTypes.string,
   }),
+  openHandler: PropTypes.func.isRequired,
 }
 
 export default ItemCard;

@@ -11,8 +11,9 @@ import {
 } from '../actions/items.actions';
 import {
   changeAlbumModalState,
-  changePhotoModalState, 
-  changeView, 
+  changePhotoModalState,
+  changePhotoView,
+  changeView,
   removePhotoFilter,
 } from '../actions/views.actions';
 
@@ -22,6 +23,7 @@ import AlbumsDash from '../components/AlbumsDash';
 import ManageDash from '../components/ManageDash';
 import Navbar from '../components/Navbar';
 import PhotosDash from '../components/PhotosDash';
+import PhotoViewModal from '../components/modals/PhotoViewModal';
 import SearchBar from '../components/SearchBar';
 
 
@@ -46,6 +48,7 @@ export class DashboardContainer extends React.Component {
       case viewsEnum.PHOTOS:
         viewComponent = <PhotosDash
           albums={this.props.albumMap}
+          openPhotoView={(item) => this.props.changePhotoViewModal(true, item)}
           params={this.props.views.params}
           photos={this.props.items}
           removePhotoFilter={this.props.removePhotoFilter}
@@ -84,6 +87,12 @@ export class DashboardContainer extends React.Component {
           openHandler={() => console.log('album open handler')}
           saveAlbumRequest={this.props.saveAlbumRequest}
         />
+        <PhotoViewModal
+          closeHandler={() => this.props.changePhotoViewModal(false, {})}
+          currentItem={this.props.views.photoViewParams.currentItem}
+          isOpen={this.props.views.photoViewModalState}
+          openHandler={() => console.log('photo view open handler')}
+        />
       </div>
     );
   }
@@ -109,6 +118,7 @@ const mapDispatchToProps = dispatch => ({
   })),
   changeAlbumModal: (newState) => dispatch(changeAlbumModalState({ newState })),
   changePhotoModal: (newState) => dispatch(changePhotoModalState({ newState })),
+  changePhotoViewModal: (newState, item) => dispatch(changePhotoView({ newState, item })),
   removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
   saveAlbumRequest: ({ description, name }) => dispatch(postAlbumRequest({ description, name })),
   saveImageRequest: ({ albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash}) => dispatch(postItemRequest({ 

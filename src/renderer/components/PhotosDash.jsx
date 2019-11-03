@@ -20,6 +20,7 @@ const filterItems = (items, params) => {
 
 const PhotosDash = ({
   albums,
+  openPhotoView,
   params,
   photos,
   removePhotoFilter,
@@ -28,7 +29,6 @@ const PhotosDash = ({
   if (photos.length < 1) {
     photoRender = <div className="photo-collection">No photos exist.</div>
   } else {
-    console.log(params);
     photoRender = (
       <div className="photo-collection">
         {
@@ -36,6 +36,7 @@ const PhotosDash = ({
             <ItemCard
               item={item}
               key={item.id}
+              openHandler={openPhotoView}
             />
           ))
         }
@@ -60,7 +61,8 @@ const PhotosDash = ({
 
 PhotosDash.defaultProps = {};
 PhotosDash.PropTypes = {
-  albums: PropTypes.shape({}),
+  albums: PropTypes.shape({}).isRequired,
+  openPhotoView: PropTypes.func.isRequired,
   params: PropTypes.shape({
     album_id: PropTypes.number,
     hash: PropTypes.string,

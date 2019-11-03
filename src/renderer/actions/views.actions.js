@@ -21,3 +21,9 @@ export const changeAlbumModalState = ({ newState }) => ({
   type: viewConstants.CHANGE_ALBUM_MODAL_STATE,
   newState,
 });
+
+export const changePhotoView = ({ newState, item = {}}) => ({
+  type: viewConstants.CHANGE_PHOTO_VIEW_MODAL_STATE,
+  newState,
+  item,
+});
