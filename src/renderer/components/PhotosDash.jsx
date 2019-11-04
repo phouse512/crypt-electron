@@ -6,8 +6,21 @@ import { paramsToFilters } from './helpers';
 import ItemCard from './photos/ItemCard';
 import PhotoFilters from './photos/PhotoFilters';
 
+const filterItems = (items, params) => {
+  // filter by albums
+  let filteredItems = items;
+  if (params.hasOwnProperty('album') && params.album.length > 0) {
+    filteredItems = filteredItems.filter(item => {
+      return params.album.includes(item.album_id);
+    });
+  }
+
+  return filteredItems;
+}
+
 const PhotosDash = ({
   albums,
+  openPhotoView,
   params,
   photos,
   removePhotoFilter,
@@ -19,10 +32,11 @@ const PhotosDash = ({
     photoRender = (
       <div className="photo-collection">
         {
-          photos.map((item, idx) => (
+          filterItems(photos, params).map((item, idx) => (
             <ItemCard
               item={item}
               key={item.id}
+              openHandler={openPhotoView}
             />
           ))
         }
@@ -47,7 +61,8 @@ const PhotosDash = ({
 
 PhotosDash.defaultProps = {};
 PhotosDash.PropTypes = {
-  albums: PropTypes.shape({}),
+  albums: PropTypes.shape({}).isRequired,
+  openPhotoView: PropTypes.func.isRequired,
   params: PropTypes.shape({
     album_id: PropTypes.number,
     hash: PropTypes.string,

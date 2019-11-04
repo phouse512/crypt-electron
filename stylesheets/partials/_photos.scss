@@ -60,3 +60,79 @@
   margin-top: auto;
   width: 100%;
 }
+
+.photo-view {
+  display: flex;
+  flex-direction: column;
+
+  &__change {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: center;
+    position: fixed;
+    top: 0px;
+    width: 15vw;
+
+    div {
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      display: none;
+      font-size: 26px;
+      height: 40px;
+      text-align: center;
+      vertical-align: middle;
+      width: 40px;
+    }
+  }
+
+  &__change:hover {
+    div {
+      display: block;
+    }
+  }
+
+  .next {
+    right: 0px;
+  }
+
+  .previous {
+    left: 0px;
+  }
+
+  .cancel-overlay {
+    color: white;
+    padding: 10px;
+    position: absolute;
+    z-index: 2;
+  }
+
+  .cancel-overlay:hover {
+    cursor: pointer;
+  }
+
+  &__image {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    justify-content: center;
+    max-height: 100vh;
+    max-width: 100%;
+    padding-left: 5vw;
+    padding-right: 5vw;
+
+    div {
+      img {
+        display: block;
+        margin: auto;
+        max-height: 100%;
+        max-width: 100%;
+      }
+    }
+
+    
+
+  }
+
+}
