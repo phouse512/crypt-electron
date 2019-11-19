@@ -452,4 +452,51 @@ ipc.answerRenderer(ipcConstants.DECRYPT_ALBUM_DETAILS, async data => {
       data: {},
     };
   }
-})
+});
+
+ipc.answerRenderer(ipcConstants.DECRYPT_ITEM_METADATA, async data => {
+  try {
+    // get muk from data
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
+    // get all album encrypted vault keys
+
+    // decrypt vault keys, build keymap album id -> key
+    const albumKeyMap = {};
+    for (var i=0; i < data.albums.length; i++) {
+      const album = data.albums[i];
+      const decVaultKey = decrypt(
+        data.muk.alg,
+        mukBuffer,
+        Buffer.from(album.encrypted_vault_key, 'base64'),
+      );
+
+      const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+      const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+      albumKeyMap[album.id] = Object.assign({}, vaultKeyset, {
+        vaultKeyBuf,
+      });
+    }
+
+    // for each item, decrypt and add to map
+    const itemMap = {};
+    for (var i=0; i < data.items.length; i++) {
+      const item = data.items[i];
+      if (!item.metadata) continue;
+
+      const albumKeyObj = albumKeyMap[item.album_id];
+      const decryptedMetadata = decrypt(
+        albumKeyObj.alg,
+        albumKeyObj.vaultKeyBuf,
+        Buffer.from(item.metadata, 'base64'),
+      );
+      
+    }
+
+  } catch (error) {
+    console.error('unable to decrypt item metadata: ', error);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});
