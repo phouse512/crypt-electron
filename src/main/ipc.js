@@ -252,13 +252,22 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
 
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
   try {
+
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
     // stringify metadata obj
     const metadataStr = JSON.stringify(data.metadata);
+    const decVaultKey = decrypt(
+      data.muk.alg,
+      mukBuffer,
+      Buffer.from(data.album.encrypted_vault_key, 'base64'),
+    )
 
+    const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+    const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+  
     // encrypt metadata
     const metadataBuf = Buffer.from(metadataStr, 'utf-8');
-    const mukBuffer = Buffer.from(data.muk.k, 'base64');
-    const encryptedMetadata = encrypt(data.muk.alg, mukBuffer, metadataBuf);
+    const encryptedMetadata = encrypt(vaultKeyset.alg, vaultKeyBuf, metadataBuf);
 
     // checksum encrypted metadata
     const hash = new SHA3(512);
@@ -484,14 +493,24 @@ ipc.answerRenderer(ipcConstants.DECRYPT_ITEM_METADATA, async data => {
       if (!item.metadata) continue;
 
       const albumKeyObj = albumKeyMap[item.album_id];
+      console.log('album key obj: ', albumKeyObj);
+      console.log(item.metadata);
       const decryptedMetadata = decrypt(
         albumKeyObj.alg,
         albumKeyObj.vaultKeyBuf,
         Buffer.from(item.metadata, 'base64'),
-      );
-      
+      ).toString('utf-8');
+      // console.log(i)
+
+      itemMap[item.id] = JSON.parse(decryptedMetadata)
     }
 
+    return {
+      error: false,
+      data: {
+        itemMap,
+      },
+    };
   } catch (error) {
     console.error('unable to decrypt item metadata: ', error);
     return {
