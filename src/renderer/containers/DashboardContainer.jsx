@@ -92,6 +92,7 @@ export class DashboardContainer extends React.Component {
           currentItem={this.props.views.photoViewParams.currentItem}
           isOpen={this.props.views.photoViewModalState}
           openHandler={() => console.log('photo view open handler')}
+          viewMetadata={this.props.views.photoViewParams.viewMetadata}
         />
       </div>
     );

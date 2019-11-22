@@ -11,7 +11,7 @@ import {
   setAlbums,
   setAlbumDetails,
   setItems,
-  setItemsPaths,
+  setItemsData,
 } from '../actions/items.actions';
 import { changeAlbumModalState, changePhotoModalState } from '../actions/views.actions';
 import { itemConstants } from '../constants';
@@ -73,7 +73,7 @@ function* fetchItemsSaga(action) {
     muk: mukObj,
   });
 
-  yield put(setItemsPaths({ itemMap: resp.data.items }));
+  yield put(setItemsData({ itemMap: resp.data.items }));
 
   // decrypt item metadata
   const album = yield select(getAlbumById, action.albumId);
@@ -83,7 +83,7 @@ function* fetchItemsSaga(action) {
     muk: mukObj,
   })
 
-  console.log(metadataResp);
+  yield put(setItemsData({ itemMap: metadataResp.data.itemMap }));
 }
 
 function* postAlbumSaga(action) {
@@ -135,11 +135,13 @@ function* postItemSaga(action) {
       const valueName = `value${i}`;
       newObj[action.itemMetadata[keyName]] = action.itemMetadata[valueName];
     }
-    console.log(newObj);
 
     const resp = yield ipc.callMain(ipcConstants.GET_ENCRYPTED_METADATA, {
       album,
-      metadata: newObj,
+      metadata: {
+        metadata: newObj,
+        version: '11-21-2019', 
+      },
       muk: mukObj,
     });
 

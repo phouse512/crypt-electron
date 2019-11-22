@@ -25,7 +25,7 @@ const items = (state = baseState, action) => {
           return prev;
         }, state.items),
       });
-    case itemConstants.SET_ITEMS_PATHS:
+    case itemConstants.SET_ITEMS_DATA:
       return Object.assign({}, state, {
         items: state.itemIds.reduce((prev, next) => {
           const existing = state.items[next];

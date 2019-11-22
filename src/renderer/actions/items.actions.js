@@ -20,8 +20,8 @@ export const setItems = ({ items }) => ({
   items,
 });
 
-export const setItemsPaths = ({ itemMap }) => ({
-  type: itemConstants.SET_ITEMS_PATHS,
+export const setItemsData = ({ itemMap }) => ({
+  type: itemConstants.SET_ITEMS_DATA,
   itemMap,
 });
 

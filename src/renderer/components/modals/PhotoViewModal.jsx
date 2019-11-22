@@ -9,6 +9,7 @@ const PhotoViewModal = ({
   nextItemId,
   openHandler,
   previousItemId,
+  viewMetadata,
 }) => {
   let itemView;
   if (currentItem) {
@@ -35,9 +36,11 @@ const PhotoViewModal = ({
             <img src={currentItem.itemPath} />
           </div>
         </div>
-        <div className="photo-view__metadata">
-          metadata
-        </div>
+        { viewMetadata &&
+          <div className="photo-view__metadata">
+            metadata
+          </div>
+        }
       </div>
     )
   } else {
@@ -64,6 +67,7 @@ PhotoViewModal.PropTypes = {
   nextItemId: PropTypes.number.isRequired,
   openHandler: PropTypes.func.isRequired,
   previousItemId: PropTypes.number.isRequired,
+  viewMetadata: PropTypes.bool.isRequired,
 };
 
 export default PhotoViewModal;

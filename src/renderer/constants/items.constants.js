@@ -5,10 +5,10 @@ export const itemConstants = {
   FETCH_ITEMS_REQUEST: 'IC_FETCH_ITEMS_REQUEST',
   SET_ALBUMS: 'IC_SET_ALBUMS',
   SET_ITEMS: 'IC_SET_ITEMS',
-  SET_ITEMS_PATHS: 'IC_SET_ITEMS_PATHS',
 
   // constants around decryption
   SET_ALBUM_DETAILS: 'IC_SET_ALBUM_DETAILS',
+  SET_ITEMS_DATA: 'IC_SET_ITEMS_DATA',
 
   // constants around creating item
   POST_ITEM_REQUEST: 'IC_POST_ITEM_REQUEST',

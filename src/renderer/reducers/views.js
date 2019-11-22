@@ -8,6 +8,7 @@ const baseState = {
   photoViewModalState: false,
   photoViewParams: {
     currentItem: {},
+    viewMetadata: false,
   },
 };
 
@@ -50,6 +51,12 @@ const views = (state = baseState, action) => {
         photoViewModalState: action.newState,
         photoViewParams: Object.assign({}, state.photoViewParams, {
           currentItem: action.item,
+        }),
+      });
+    case viewConstants.CHANGE_PHOTO_VIEW_METADATA:
+      return Object.assign({}, state, {
+        photoViewParams: Object.assign({}, state.photoViewParams, {
+          viewMetadata: action.display,
         }),
       });
     default:

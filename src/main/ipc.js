@@ -490,7 +490,10 @@ ipc.answerRenderer(ipcConstants.DECRYPT_ITEM_METADATA, async data => {
     const itemMap = {};
     for (var i=0; i < data.items.length; i++) {
       const item = data.items[i];
-      if (!item.metadata) continue;
+      if (!item.metadata) {
+        itemMap[item.id] = { decryptedMetadata: null };
+        continue;
+      }
 
       const albumKeyObj = albumKeyMap[item.album_id];
       console.log('album key obj: ', albumKeyObj);
@@ -500,9 +503,10 @@ ipc.answerRenderer(ipcConstants.DECRYPT_ITEM_METADATA, async data => {
         albumKeyObj.vaultKeyBuf,
         Buffer.from(item.metadata, 'base64'),
       ).toString('utf-8');
-      // console.log(i)
 
-      itemMap[item.id] = JSON.parse(decryptedMetadata)
+      itemMap[item.id] = {
+        decryptedMetadata: JSON.parse(decryptedMetadata),
+      };
     }
 
     return {
