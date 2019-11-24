@@ -27,3 +27,7 @@ export const changePhotoView = ({ newState, item = {}}) => ({
   newState,
   item,
 });
+
+export const displayMetadata = () => ({
+  type: viewConstants.CHANGE_PHOTO_VIEW_METADATA,
+});

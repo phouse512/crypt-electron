@@ -252,13 +252,22 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
 
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
   try {
+
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
     // stringify metadata obj
     const metadataStr = JSON.stringify(data.metadata);
+    const decVaultKey = decrypt(
+      data.muk.alg,
+      mukBuffer,
+      Buffer.from(data.album.encrypted_vault_key, 'base64'),
+    )
 
+    const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+    const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+  
     // encrypt metadata
     const metadataBuf = Buffer.from(metadataStr, 'utf-8');
-    const mukBuffer = Buffer.from(data.muk.k, 'base64');
-    const encryptedMetadata = encrypt(data.muk.alg, mukBuffer, metadataBuf);
+    const encryptedMetadata = encrypt(vaultKeyset.alg, vaultKeyBuf, metadataBuf);
 
     // checksum encrypted metadata
     const hash = new SHA3(512);
@@ -452,4 +461,65 @@ ipc.answerRenderer(ipcConstants.DECRYPT_ALBUM_DETAILS, async data => {
       data: {},
     };
   }
-})
+});
+
+ipc.answerRenderer(ipcConstants.DECRYPT_ITEM_METADATA, async data => {
+  try {
+    // get muk from data
+    const mukBuffer = Buffer.from(data.muk.k, 'base64');
+    // get all album encrypted vault keys
+
+    // decrypt vault keys, build keymap album id -> key
+    const albumKeyMap = {};
+    for (var i=0; i < data.albums.length; i++) {
+      const album = data.albums[i];
+      const decVaultKey = decrypt(
+        data.muk.alg,
+        mukBuffer,
+        Buffer.from(album.encrypted_vault_key, 'base64'),
+      );
+
+      const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+      const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+      albumKeyMap[album.id] = Object.assign({}, vaultKeyset, {
+        vaultKeyBuf,
+      });
+    }
+
+    // for each item, decrypt and add to map
+    const itemMap = {};
+    for (var i=0; i < data.items.length; i++) {
+      const item = data.items[i];
+      if (!item.metadata) {
+        itemMap[item.id] = { decryptedMetadata: null };
+        continue;
+      }
+
+      const albumKeyObj = albumKeyMap[item.album_id];
+      console.log('album key obj: ', albumKeyObj);
+      console.log(item.metadata);
+      const decryptedMetadata = decrypt(
+        albumKeyObj.alg,
+        albumKeyObj.vaultKeyBuf,
+        Buffer.from(item.metadata, 'base64'),
+      ).toString('utf-8');
+
+      itemMap[item.id] = {
+        decryptedMetadata: JSON.parse(decryptedMetadata),
+      };
+    }
+
+    return {
+      error: false,
+      data: {
+        itemMap,
+      },
+    };
+  } catch (error) {
+    console.error('unable to decrypt item metadata: ', error);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+});

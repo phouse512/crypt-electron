@@ -11,7 +11,7 @@ import {
   setAlbums,
   setAlbumDetails,
   setItems,
-  setItemsPaths,
+  setItemsData,
 } from '../actions/items.actions';
 import { changeAlbumModalState, changePhotoModalState } from '../actions/views.actions';
 import { itemConstants } from '../constants';
@@ -24,6 +24,7 @@ import {
 import ipcConstants from '../../constants/ipc';
 import { getM } from '../../main/srp';
 
+export const getAlbumById = (state, albumId) => state.items.albums[albumId];
 export const getJWToken = (state) => state.login.jwtData.encoded_token;
 export const getMukObj = (state) => state.login.mukData;
 
@@ -72,7 +73,17 @@ function* fetchItemsSaga(action) {
     muk: mukObj,
   });
 
-  yield put(setItemsPaths({ itemMap: resp.data.items }));
+  yield put(setItemsData({ itemMap: resp.data.items }));
+
+  // decrypt item metadata
+  const album = yield select(getAlbumById, action.albumId);
+  const metadataResp = yield ipc.callMain(ipcConstants.DECRYPT_ITEM_METADATA, {
+    albums: [album],
+    items: result.data.items,
+    muk: mukObj,
+  })
+
+  yield put(setItemsData({ itemMap: metadataResp.data.itemMap }));
 }
 
 function* postAlbumSaga(action) {
@@ -114,9 +125,23 @@ function* postItemSaga(action) {
   try {
     // get muk obj
     const mukObj = yield select(getMukObj);
+    const album = yield select(getAlbumById, action.albumId);
+
+    // convert metadata from {key1: '', value1: '',....} -> object
+    const objValuesLength = Object.keys(action.itemMetadata).length;
+    const newObj = {};
+    for (var i=1; i <= objValuesLength / 2; i++) {
+      const keyName = `key${i}`;
+      const valueName = `value${i}`;
+      newObj[action.itemMetadata[keyName]] = action.itemMetadata[valueName];
+    }
 
     const resp = yield ipc.callMain(ipcConstants.GET_ENCRYPTED_METADATA, {
-      metadata: action.itemMetadata,
+      album,
+      metadata: {
+        metadata: newObj,
+        version: '11-21-2019', 
+      },
       muk: mukObj,
     });
 
