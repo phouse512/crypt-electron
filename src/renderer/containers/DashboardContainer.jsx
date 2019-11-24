@@ -14,6 +14,7 @@ import {
   changePhotoModalState,
   changePhotoView,
   changeView,
+  displayMetadata,
   removePhotoFilter,
 } from '../actions/views.actions';
 
@@ -88,6 +89,7 @@ export class DashboardContainer extends React.Component {
           saveAlbumRequest={this.props.saveAlbumRequest}
         />
         <PhotoViewModal
+          changeViewMetadata={this.props.changePhotoViewMetadata}
           closeHandler={() => this.props.changePhotoViewModal(false, {})}
           currentItem={this.props.views.photoViewParams.currentItem}
           isOpen={this.props.views.photoViewModalState}
@@ -120,6 +122,7 @@ const mapDispatchToProps = dispatch => ({
   changeAlbumModal: (newState) => dispatch(changeAlbumModalState({ newState })),
   changePhotoModal: (newState) => dispatch(changePhotoModalState({ newState })),
   changePhotoViewModal: (newState, item) => dispatch(changePhotoView({ newState, item })),
+  changePhotoViewMetadata: () => dispatch(displayMetadata()),
   removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
   saveAlbumRequest: ({ description, name }) => dispatch(postAlbumRequest({ description, name })),
   saveImageRequest: ({ albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash}) => dispatch(postItemRequest({ 

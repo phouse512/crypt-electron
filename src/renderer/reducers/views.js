@@ -56,7 +56,7 @@ const views = (state = baseState, action) => {
     case viewConstants.CHANGE_PHOTO_VIEW_METADATA:
       return Object.assign({}, state, {
         photoViewParams: Object.assign({}, state.photoViewParams, {
-          viewMetadata: action.display,
+          viewMetadata: !state.photoViewParams.viewMetadata,
         }),
       });
     default:

@@ -112,6 +112,29 @@
     cursor: pointer;
   }
 
+  .info-overlay {
+    color: white;
+    display: flex;
+    flex-direction: row;
+    padding: $sm-padding;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+
+    &__item {
+      margin-left: $sm-margin;
+    }
+
+    &__item:hover {
+      cursor: pointer;
+    }
+  }
+
+  .info-overlay.dark {
+    color: black;
+  }
+
   &__image {
     display: flex;
     flex-direction: row;
@@ -134,8 +157,22 @@
   }
 
   &__metadata {
+    background-color: white;
     display: flex;
     flex-direction: column;
     flex-basis: 30%;
+    padding: $sm-padding;
+
+    .list-view {
+      font-family: 'Work Sans';
+      padding-bottom: $sm-padding;
+      padding-top: $sm-padding;
+
+      &__item {
+        margin-bottom: $sm-margin;
+        margin-top: $sm-margin;
+        min-height: 20px;
+      }
+    }
   }
 }

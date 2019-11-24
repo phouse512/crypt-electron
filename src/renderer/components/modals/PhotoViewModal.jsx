@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ReactModal from 'react-modal';
 
 const PhotoViewModal = ({
+  changeViewMetadata,
   closeHandler,
   currentItem,
   isOpen,
@@ -13,6 +14,20 @@ const PhotoViewModal = ({
 }) => {
   let itemView;
   if (currentItem) {
+    // render list of metadata
+    let metadataList;
+    if (currentItem.decryptedMetadata && currentItem.decryptedMetadata.metadata) {
+      metadataList = (
+        Object.keys(currentItem.decryptedMetadata.metadata).map(key => {
+          return (
+            <div className="list-view__item">
+              <b>{key}:</b> {currentItem.decryptedMetadata.metadata[key]}
+            </div>
+          );
+        })
+      );
+    }
+
     itemView = (
       <div className="photo-view">
         <div 
@@ -21,7 +36,21 @@ const PhotoViewModal = ({
         >
           <i className="fas fa-times"></i>
         </div>
-        <div className="photo-view__change next">
+        <div className={`info-overlay` + (viewMetadata ? ` dark` : ``)}>
+          <div className="info-overlay__item">
+            <i class="fas fa-arrow-left"></i>
+          </div>
+          <div 
+            className="info-overlay__item"
+            onClick={() => changeViewMetadata()}
+          >
+            <i className="fas fa-info-circle"></i>
+          </div>
+          <div className="info-overlay__item">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </div>
+        {/* <div className="photo-view__change next">
           <div>
             <i className="fas fa-arrow-right"></i>
           </div>
@@ -30,7 +59,7 @@ const PhotoViewModal = ({
           <div>
             <i className="fas fa-arrow-left"></i>
           </div>
-        </div>
+        </div> */}
         <div className="photo-view__image">
           <div>
             <img src={currentItem.itemPath} />
@@ -39,6 +68,10 @@ const PhotoViewModal = ({
         { viewMetadata &&
           <div className="photo-view__metadata">
             metadata
+
+            <div className="list-view">
+              {metadataList}
+            </div>
           </div>
         }
       </div>
@@ -61,6 +94,7 @@ const PhotoViewModal = ({
 
 PhotoViewModal.defaultProps = {};
 PhotoViewModal.PropTypes = {
+  changeViewMetadata: PropTypes.func.isRequired,
   closeHandler: PropTypes.func.isRequired,
   currentItem: PropTypes.shape({}).isRequired,
   isOpen: PropTypes.bool.isRequired,
