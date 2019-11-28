@@ -3,12 +3,46 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  margin-top: $md-margin;
   min-height: 50px;
   padding: $sm-padding;
 }
 
 .search-section {
-  background-color: red;
+  background-color: $grey-lightest;
+  border: 2px $grey-light;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px $grey-lightest, 0 0;
+  flex-grow: 1;
+  margin-left: $sm-margin;
+  margin-right: $md-margin;
+
+  form {
+    height: 100%;
+
+    div {
+      height: 100%;
+      padding-left: $sm-padding;
+    }
+  }
+
+  input {
+    background-color: transparent;
+    border: 0;
+    font-size: 20px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  input[type="text"]::placeholder {
+    color: $grey;
+  }
 }
 
 .shortcut-bar {

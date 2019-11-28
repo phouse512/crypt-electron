@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import SearchForm from './forms/SearchForm';
+
 const SearchBar = ({
   openAlbumModal,
   openPhotoModal,
@@ -8,7 +10,9 @@ const SearchBar = ({
   return (
     <div className="search-bar">
       <div className="search-section">
-        Searchity Search
+        <SearchForm 
+          onSubmit={values => console.log(values)}
+        />
       </div>
       <div className="shortcut-bar">
         <div className="shortcut-bar__button">
