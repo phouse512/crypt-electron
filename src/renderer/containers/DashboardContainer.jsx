@@ -41,6 +41,7 @@ export class DashboardContainer extends React.Component {
         viewComponent = <AlbumsDash
           albums={this.props.albums}
           goToAlbum={this.props.goToAlbum}
+          items={this.props.items}
         />;
         break;
       case viewsEnum.MANAGE:
