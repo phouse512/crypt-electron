@@ -6,6 +6,7 @@ const Album = ({
   goToAlbum,
   id,
   name,
+  recentItems,
   size,
 }) => {
   let displayName = decryptedName;
@@ -17,7 +18,18 @@ const Album = ({
       onClick={() => goToAlbum(id)} 
       className="album-card"
     >
-      {displayName} - {size}
+      <div className="album-card__header">
+        {displayName}
+        <span>{size} photo{`${size !== 1 ? 's' : ''}`}</span>
+      </div>
+      <div className="album-card__body">
+        {recentItems.map(item => (
+          <div>
+            <img src={item.itemPath}/>
+          </div>
+        ))}
+      </div>
+      
     </div>
   );
 };
@@ -28,6 +40,10 @@ Album.PropTypes = {
   goToAlbum: PropTypes.func.isRequired,
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
+  recentItems: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    itemPath: PropTypes.string.isRequired,
+  }).isRequired,
   size: PropTypes.number.isRrequired,
 };
 

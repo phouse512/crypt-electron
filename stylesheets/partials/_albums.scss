@@ -7,16 +7,64 @@
 
 .album-collection {
   display: flex;
+  font-family: 'Work Sans', sans-serif;
   padding: $sm-margin;
 
   .album-card {
-    background-color: $grey-light;
+    border: 1px solid $grey-light;
     border-radius: 5px;
+    cursor: pointer;
     margin: $sm-margin;
     max-height: 150px;
     max-width: 150px;
     min-height: 150px;
     min-width: 150px;
+
+    .album-card__header {
+      border-bottom: 1px solid $grey-light;
+      min-height: 20px;
+      max-height: 20px;
+      padding: $sm-padding;
+
+      span {
+        background-color: $accent-0;
+        border-radius: 3px;
+        color: white;
+        float: right;
+        font-size: 12px;
+        height: 16px;
+        // margin-top: 2px;
+        padding-left: 2px;
+        padding-right: 2px;
+        padding-top: 2px;
+        padding-bottom: 1px;
+        text-align: center;
+      }
+    }
+
+    .album-card__body {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+
+      div {
+        display: flex;
+        max-height: 60px;
+        max-width: 50px;
+        min-height: 60px;
+        min-width: 50px;
+        padding-left: 15px; // hardcoded based on album sizes
+
+        img {
+          display: block;
+          margin: auto;
+          max-height: 100%;
+          max-width: 100%;
+        }
+      }
+    }
   }
 }
 
