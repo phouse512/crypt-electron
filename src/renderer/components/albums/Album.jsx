@@ -20,7 +20,7 @@ const Album = ({
     >
       <div className="album-card__header">
         {displayName}
-        <span>{size} photo{`${size > 1 ? 's' : ''}`}</span>
+        <span>{size} photo{`${size !== 1 ? 's' : ''}`}</span>
       </div>
       <div className="album-card__body">
         {recentItems.map(item => (
