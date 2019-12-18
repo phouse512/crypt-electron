@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { viewsEnum } from '../constants';
+import { newPhotoMetadata } from '../actions/forms.actions';
 import { 
   fetchAlbums, 
   fetchItems,
@@ -76,6 +77,7 @@ export class DashboardContainer extends React.Component {
           {viewComponent}
         </div>
         <AddPhotoModal
+          addMetadata={this.props.addNewPhotoMetadata}
           albums={this.props.albums}
           closeHandler={() => this.props.changePhotoModal(false)}
           isOpen={this.props.views.photoModalState}
@@ -113,6 +115,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  addNewPhotoMetadata: (metadata) => dispatch(newPhotoMetadata(metadata)),
   changeView: (view) => dispatch(changeView({ view })),
   fetchAlbums: (fetchItems) => dispatch(fetchAlbums({ fetchItems })),
   fetchItems: (albumId) => dispatch(fetchItems({ albumId })),

@@ -5,6 +5,8 @@ const ipc = require('electron-better-ipc');
 import { SHA3 } from 'sha3';
 import fs from 'fs';
 import fetch from 'node-fetch';
+const ExifImage = require('exif').ExifImage;
+import moment from 'moment';
 
 import ipcConstants from '../constants/ipc';
 import userConfig from '../constants/storage';
@@ -290,6 +292,70 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
     };
   }
 });
+
+const getExifData = (filePath) => {
+  return new Promise((resolve, reject) => {
+    ExifImage({ image: filePath }, (error, exifData) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(exifData);
+      }
+    });
+  });
+};
+
+ipc.answerRenderer(ipcConstants.GET_PHOTO_DATA, async data => {
+  try {
+    if (data.type === 'image/jpeg') {
+      const exifData = await getExifData(data.path);
+      const exifResp = {
+        error: false,
+        data: {
+          imagePath: data.path,
+          metadata: [
+            {
+              key: 'Device',
+              value: `${exifData.image.Make} ${exifData.image.Model}`
+            },
+            {
+              key: 'Width',
+              value: exifData.exif.ExifImageWidth,
+            },
+            {
+              key: 'Height',
+              value: exifData.exif.ExifImageHeight,
+            },
+            {
+              key: 'Timestamp',
+              value: moment(
+                exifData.exif.DateTimeOriginal,
+                'YYYY:DD:MM HH:mm:ss',
+              ).unix(),
+            },
+          ],
+        },
+      };
+
+      return exifResp;
+    } else {
+      console.log('unknown image type');
+      return {
+        error: false,
+        data: {
+          imagePath: data.path,
+          metadata: {}
+        }
+      }
+    }
+  } catch (error) {
+    console.error('error: ', error);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+})
 
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
   try {

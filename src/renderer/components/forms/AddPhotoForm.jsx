@@ -7,7 +7,7 @@ import FieldMetadataInput from './FieldMetadataInput';
 import AddPhotoModal from '../modals/AddPhotoModal';
 
 let AddPhotoForm = props => {
-  const { albums, handleSubmit, invalid } = props;
+  const { addMetadata, albums, handleSubmit, invalid } = props;
   return (
     <form onSubmit={handleSubmit}>
       <div>
@@ -28,6 +28,7 @@ let AddPhotoForm = props => {
           }
         </Field>
         <Field
+          addMetadata={addMetadata}
           name="photoField"
           component={FieldFileInput}
           mukObj={props.mukObj}
@@ -48,6 +49,7 @@ let AddPhotoForm = props => {
 };
 
 AddPhotoForm.PropTypes = {
+  addMetadata: PropTypes.func.isRequired,
   albums: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,

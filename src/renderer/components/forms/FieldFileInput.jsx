@@ -9,26 +9,33 @@ export default class FieldFileInput extends React.Component {
     this.onChange = this.onChange.bind(this);
   }
 
-  async getEncryptedBase64(file) {
-    const resp = await ipc.callMain(ipcConstants.GET_ENCRYPTED_PHOTO, {
+  async getPhotoData(file) {
+    // const resp = await ipc.callMain(ipcConstants.GET_ENCRYPTED_PHOTO, {
+    //   name: file.name,
+    //   path: file.path,
+    //   type: file.type,
+    //   muk: this.props.mukObj,
+    // });
+
+    const resp = await ipc.callMain(ipcConstants.GET_PHOTO_DATA, {
       name: file.name,
       path: file.path,
       type: file.type,
-      muk: this.props.mukObj,
     });
     return resp;
   }
 
   async onChange(e) {
-    const { input: { onChange } } = this.props;
+    const { input: { onChange }, addMetadata } = this.props;
     const targetFile = e.target.files[0];
     if (targetFile) {
-      const val = await this.getEncryptedBase64(targetFile);
+      const val = await this.getPhotoData(targetFile);
       if (val.error) {
         alert("ERROR");
         onChange(null);
       } else {
-        onChange(val.data);
+        onChange(val.data.imagePath);
+        addMetadata(val.data.metadata);
       }
     } else {
       onChange(null);
