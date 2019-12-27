@@ -254,7 +254,6 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
 
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
   try {
-
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
     // stringify metadata obj
     const metadataStr = JSON.stringify(data.metadata);
@@ -262,7 +261,7 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
       data.muk.alg,
       mukBuffer,
       Buffer.from(data.album.encrypted_vault_key, 'base64'),
-    )
+    );
 
     const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
     const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
@@ -330,7 +329,7 @@ ipc.answerRenderer(ipcConstants.GET_PHOTO_DATA, async data => {
               key: 'Timestamp',
               value: moment(
                 exifData.exif.DateTimeOriginal,
-                'YYYY:DD:MM HH:mm:ss',
+                'YYYY:MM:DD HH:mm:ss',
               ).unix(),
             },
           ],
@@ -359,32 +358,39 @@ ipc.answerRenderer(ipcConstants.GET_PHOTO_DATA, async data => {
 
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
   try {
-    // load file into buffer
     const imageBuffer = fs.readFileSync(data.path);
-
-    // use muk data to use different algo
-    let encryptedImage;
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
-    encryptedImage = encrypt(data.muk.alg, mukBuffer, imageBuffer);
 
-    // checksum image buffer
+    const decVaultKey = decrypt(
+      data.muk.alg,
+      mukBuffer,
+      Buffer.from(data.album.encrypted_vault_key, 'base64'),
+    );
+
+    const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+    const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+  
+    // checksum raw photo
     const hash = new SHA3(512);
     hash.update(imageBuffer);
-    const imageCheckSum = hash.digest('base64');
+    const rawImageChecksum = hash.digest('base64');
 
-    // checksum encrypted image
+    // encrypt photo
+    const encryptedPhoto = encrypt(vaultKeyset.alg, vaultKeyBuf, imageBuffer);
+
+    // checksum encrypted photo
     const encryptedHash = new SHA3(512);
-    encryptedHash.update(encryptedImage);
-    const encImageCheckSum = encryptedHash.digest('base64');
+    encryptedHash.update(encryptedPhoto);
+    const encImageChecksum = encryptedHash.digest('base64');
 
     // return base64 encoded encrypted buffer
     // return checksum
     return {
       error: false,
       data: {
-        image: encryptedImage.toString('base64'),
-        originalImageHash: imageCheckSum,
-        encImageHash: encImageCheckSum,
+        image: encryptedPhoto.toString('base64'),
+        originalImageHash: rawImageChecksum,
+        encImageHash: encImageChecksum,
       },
     };
   } catch (err) {

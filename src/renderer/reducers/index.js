@@ -6,8 +6,26 @@ import login from './login';
 import setup from './setup';
 import views from './views';
 
+import { formsConstants } from '../constants';
+
+const customFormReducer = {
+  addPhoto: (state, action) => {
+    switch (action.type) {
+      case formsConstants.NEW_PHOTO_METADATA:
+        return Object.assign({}, state, {
+          values: {
+            ...state.values,
+            metadata: action.metadataFields,
+          },
+        });
+      default:
+        return state;
+    }
+  },
+};
+
 const appReducer = combineReducers({
-  form: formReducer,
+  form: formReducer.plugin(customFormReducer),
   items,
   login,
   setup,

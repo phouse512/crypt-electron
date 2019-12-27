@@ -127,14 +127,10 @@ function* postItemSaga(action) {
     const mukObj = yield select(getMukObj);
     const album = yield select(getAlbumById, action.albumId);
 
-    // convert metadata from {key1: '', value1: '',....} -> object
-    const objValuesLength = Object.keys(action.itemMetadata).length;
     const newObj = {};
-    for (var i=1; i <= objValuesLength / 2; i++) {
-      const keyName = `key${i}`;
-      const valueName = `value${i}`;
-      newObj[action.itemMetadata[keyName]] = action.itemMetadata[valueName];
-    }
+    action.itemMetadata.forEach((item) => {
+      newObj[item.key] = newObj[item.value];
+    });
 
     const resp = yield ipc.callMain(ipcConstants.GET_ENCRYPTED_METADATA, {
       album,
@@ -145,6 +141,12 @@ function* postItemSaga(action) {
       muk: mukObj,
     });
 
+    const itemResp = yield ipc.callMain(ipcConstants.GET_ENCRYPTED_PHOTO, {
+      album,
+      path: action.itemPath,
+      muk: mukObj,
+    })
+
     if (resp.error) {
       console.error('Unable to encrypt metadata.')
       throw Error("Unable to encrypt!!");
@@ -154,8 +156,8 @@ function* postItemSaga(action) {
 
     const result = yield postItem({
       albumId: action.albumId,
-      itemData: action.itemData,
-      itemDataHash: action.itemDataHash,
+      itemData: itemResp.data.image,
+      itemDataHash: itemResp.data.encImageHash,
       itemMetadata: resp.data.metadata,
       itemMetadataHash: resp.data.metadataHash,
       jwt: jwtoken,

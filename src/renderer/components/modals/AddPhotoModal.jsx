@@ -24,8 +24,7 @@ const AddPhotoModal = ({
       mukObj={mukObj}
       onSubmit={values => saveImageRequest({
         albumId: parseInt(values.album, 10),
-        itemData: values.photoField.image,
-        itemDataHash: values.photoField.encImageHash,
+        itemPath: values.photoField,
         itemMetadata: values.metadata,
         itemMetadataHash: "",
       })}

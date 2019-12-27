@@ -1,10 +1,43 @@
 import React from 'react';
-import { Field, reduxForm } from 'redux-form';
+import { Field, FieldArray, reduxForm } from 'redux-form';
 import PropTypes from 'prop-types';
 
 import FieldFileInput from './FieldFileInput';
 import FieldMetadataInput from './FieldMetadataInput';
 import AddPhotoModal from '../modals/AddPhotoModal';
+
+const renderField = ({ input, label, type, meta: { touched, error } }) => (
+  <div>
+    <input {...input} type={type} placeholder={label} />
+  </div>
+);
+
+const renderMetadata = ({ fields, meta: { error, submitFailed } }) => (
+  <div>
+    <div>Metadata</div>
+
+    <button type="button" onClick={() => fields.push({})}>
+      Add Keypair
+    </button>
+    {submitFailed && error && <span>{error}</span>}
+    {fields.map((keypair, index) => (
+      <div key={index}>
+        <Field
+          name={`${keypair}.key`}
+          type="text"
+          component={renderField}
+          label="Key"
+        />
+        <Field
+          name={`${keypair}.value`}
+          type="text"
+          component={renderField}
+          label="Value"
+        />
+      </div>
+    ))}
+  </div>
+);
 
 let AddPhotoForm = props => {
   const { addMetadata, albums, handleSubmit, invalid } = props;
@@ -33,11 +66,15 @@ let AddPhotoForm = props => {
           component={FieldFileInput}
           mukObj={props.mukObj}
         />
-        <Field
+        <FieldArray
+          name="metadata"
+          component={renderMetadata}
+        />
+        {/* <Field
           name="metadata"
           component={FieldMetadataInput}
           mukObj={props.mukObj}
-        />
+        /> */}
       </div>
       <button
         disabled={invalid}

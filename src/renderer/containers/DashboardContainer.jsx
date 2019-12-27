@@ -129,8 +129,8 @@ const mapDispatchToProps = dispatch => ({
   changePhotoViewMetadata: () => dispatch(displayMetadata()),
   removePhotoFilter: (filter, value) => dispatch(removePhotoFilter({ filter, value })),
   saveAlbumRequest: ({ description, name }) => dispatch(postAlbumRequest({ description, name })),
-  saveImageRequest: ({ albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash}) => dispatch(postItemRequest({ 
-      albumId, itemData, itemDataHash, itemMetadata, itemMetadataHash })),
+  saveImageRequest: ({ albumId, itemPath, itemMetadata, itemMetadataHash}) => dispatch(postItemRequest({ 
+      albumId, itemPath, itemMetadata, itemMetadataHash })),
 });
 
 const DashboardWrapper = connect(
