@@ -41,15 +41,13 @@ export const postAlbumFailure = ({}) => ({
 
 export const postItemRequest = ({
   albumId,
-  itemData,
-  itemDataHash,
+  itemPath,
   itemMetadata,
   itemMetadataHash,
 }) => ({
   type: itemConstants.POST_ITEM_REQUEST,
   albumId,
-  itemData,
-  itemDataHash,
+  itemPath,
   itemMetadata,
   itemMetadataHash,
 });

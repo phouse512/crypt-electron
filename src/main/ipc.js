@@ -5,6 +5,8 @@ const ipc = require('electron-better-ipc');
 import { SHA3 } from 'sha3';
 import fs from 'fs';
 import fetch from 'node-fetch';
+const ExifImage = require('exif').ExifImage;
+import moment from 'moment';
 
 import ipcConstants from '../constants/ipc';
 import userConfig from '../constants/storage';
@@ -252,7 +254,6 @@ ipc.answerRenderer(ipcConstants.SRP_VALIDATE_HAMK, async data => {
 
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
   try {
-
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
     // stringify metadata obj
     const metadataStr = JSON.stringify(data.metadata);
@@ -260,7 +261,7 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
       data.muk.alg,
       mukBuffer,
       Buffer.from(data.album.encrypted_vault_key, 'base64'),
-    )
+    );
 
     const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
     const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
@@ -291,34 +292,105 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_METADATA, async data => {
   }
 });
 
+const getExifData = (filePath) => {
+  return new Promise((resolve, reject) => {
+    ExifImage({ image: filePath }, (error, exifData) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(exifData);
+      }
+    });
+  });
+};
+
+ipc.answerRenderer(ipcConstants.GET_PHOTO_DATA, async data => {
+  try {
+    if (data.type === 'image/jpeg') {
+      const exifData = await getExifData(data.path);
+      const exifResp = {
+        error: false,
+        data: {
+          imagePath: data.path,
+          metadata: [
+            {
+              key: 'Device',
+              value: `${exifData.image.Make} ${exifData.image.Model}`
+            },
+            {
+              key: 'Width',
+              value: exifData.exif.ExifImageWidth,
+            },
+            {
+              key: 'Height',
+              value: exifData.exif.ExifImageHeight,
+            },
+            {
+              key: 'Timestamp',
+              value: moment(
+                exifData.exif.DateTimeOriginal,
+                'YYYY:MM:DD HH:mm:ss',
+              ).unix(),
+            },
+          ],
+        },
+      };
+
+      return exifResp;
+    } else {
+      console.log('unknown image type');
+      return {
+        error: false,
+        data: {
+          imagePath: data.path,
+          metadata: {}
+        }
+      }
+    }
+  } catch (error) {
+    console.error('error: ', error);
+    return {
+      error: true,
+      data: {},
+    };
+  }
+})
+
 ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
   try {
-    // load file into buffer
     const imageBuffer = fs.readFileSync(data.path);
-
-    // use muk data to use different algo
-    let encryptedImage;
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
-    encryptedImage = encrypt(data.muk.alg, mukBuffer, imageBuffer);
 
-    // checksum image buffer
+    const decVaultKey = decrypt(
+      data.muk.alg,
+      mukBuffer,
+      Buffer.from(data.album.encrypted_vault_key, 'base64'),
+    );
+
+    const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+    const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+  
+    // checksum raw photo
     const hash = new SHA3(512);
     hash.update(imageBuffer);
-    const imageCheckSum = hash.digest('base64');
+    const rawImageChecksum = hash.digest('base64');
 
-    // checksum encrypted image
+    // encrypt photo
+    const encryptedPhoto = encrypt(vaultKeyset.alg, vaultKeyBuf, imageBuffer);
+
+    // checksum encrypted photo
     const encryptedHash = new SHA3(512);
-    encryptedHash.update(encryptedImage);
-    const encImageCheckSum = encryptedHash.digest('base64');
+    encryptedHash.update(encryptedPhoto);
+    const encImageChecksum = encryptedHash.digest('base64');
 
     // return base64 encoded encrypted buffer
     // return checksum
     return {
       error: false,
       data: {
-        image: encryptedImage.toString('base64'),
-        originalImageHash: imageCheckSum,
-        encImageHash: encImageCheckSum,
+        image: encryptedPhoto.toString('base64'),
+        originalImageHash: rawImageChecksum,
+        encImageHash: encImageChecksum,
       },
     };
   } catch (err) {
@@ -332,9 +404,26 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
 
 ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
   try {
-    // loop through images
-    console.log(data);
+    // get muk
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
+
+    // decrypt vault keys, build keymap album id -> key
+    const albumKeyMap = {};
+    for (var i=0; i < data.albums.length; i++) {
+      const album = data.albums[i];
+      const decVaultKey = decrypt(
+        data.muk.alg,
+        mukBuffer,
+        Buffer.from(album.encrypted_vault_key, 'base64'),
+      );
+
+      const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+      const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+      albumKeyMap[album.id] = Object.assign({}, vaultKeyset, {
+        vaultKeyBuf,
+      });
+    }
+
     const imageMap = {};
     let cacheHits = 0;
     for (var i=0; i < data.items.length; i++) {
@@ -352,8 +441,14 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
         encImageBuffer = fs.readFileSync(getImagePath(item.id));
         cacheHits += 1;
       }
+
       // unencrypt buffer
-      const decImageBuffer = decrypt(data.muk.alg, mukBuffer, encImageBuffer);
+      const albumKeyObj = albumKeyMap[item.album_id];
+      const decImageBuffer = decrypt(
+        albumKeyObj.alg,
+        albumKeyObj.vaultKeyBuf,
+        encImageBuffer,
+      );
       const unencPath = storeUnencImage(decImageBuffer, item.id);
       imageMap[item.id] = {
         itemPath: unencPath,
