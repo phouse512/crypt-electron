@@ -59,31 +59,39 @@ function* fetchAlbumSaga(action) {
 }
 
 function* fetchItemsSaga(action) {
-  const jwtoken = yield select(getJWToken);
-  const mukObj = yield select(getMukObj);
+  try {
+    const jwtoken = yield select(getJWToken);
+    const mukObj = yield select(getMukObj);
 
-  const result = yield listItems({
-    albumId: action.albumId,
-    jwt: jwtoken,
-  });
+    // get raw items from api and store
+    const result = yield listItems({
+      albumId: action.albumId,
+      jwt: jwtoken,
+    });
+    yield put(setItems({ items: result.data.items }));
 
-  yield put(setItems({ items: result.data.items }));
-  const resp = yield ipc.callMain(ipcConstants.LOAD_ENCRYPTED_PHOTOS, {
-    items: result.data.items,
-    muk: mukObj,
-  });
+    // get album data out of redux state 
+    const album = yield select(getAlbumById, action.albumId);
+    // decrypt photos
+    const resp = yield ipc.callMain(ipcConstants.LOAD_ENCRYPTED_PHOTOS, {
+      albums: [album],
+      items: result.data.items,
+      muk: mukObj,
+    });
+    yield put(setItemsData({ itemMap: resp.data.items }));
 
-  yield put(setItemsData({ itemMap: resp.data.items }));
+    // decrypt item metadata
+    const metadataResp = yield ipc.callMain(ipcConstants.DECRYPT_ITEM_METADATA, {
+      albums: [album],
+      items: result.data.items,
+      muk: mukObj,
+    })
 
-  // decrypt item metadata
-  const album = yield select(getAlbumById, action.albumId);
-  const metadataResp = yield ipc.callMain(ipcConstants.DECRYPT_ITEM_METADATA, {
-    albums: [album],
-    items: result.data.items,
-    muk: mukObj,
-  })
-
-  yield put(setItemsData({ itemMap: metadataResp.data.itemMap }));
+    yield put(setItemsData({ itemMap: metadataResp.data.itemMap }));
+  } catch (error) {
+    console.error('Unable to fetch items with: ', error)
+    throw error;
+  }
 }
 
 function* postAlbumSaga(action) {

@@ -404,9 +404,26 @@ ipc.answerRenderer(ipcConstants.GET_ENCRYPTED_PHOTO, async data => {
 
 ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
   try {
-    // loop through images
-    console.log(data);
+    // get muk
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
+
+    // decrypt vault keys, build keymap album id -> key
+    const albumKeyMap = {};
+    for (var i=0; i < data.albums.length; i++) {
+      const album = data.albums[i];
+      const decVaultKey = decrypt(
+        data.muk.alg,
+        mukBuffer,
+        Buffer.from(album.encrypted_vault_key, 'base64'),
+      );
+
+      const vaultKeyset = JSON.parse(decVaultKey.toString('utf-8'));
+      const vaultKeyBuf = Buffer.from(vaultKeyset.k, 'base64');
+      albumKeyMap[album.id] = Object.assign({}, vaultKeyset, {
+        vaultKeyBuf,
+      });
+    }
+
     const imageMap = {};
     let cacheHits = 0;
     for (var i=0; i < data.items.length; i++) {
@@ -424,8 +441,14 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
         encImageBuffer = fs.readFileSync(getImagePath(item.id));
         cacheHits += 1;
       }
+
       // unencrypt buffer
-      const decImageBuffer = decrypt(data.muk.alg, mukBuffer, encImageBuffer);
+      const albumKeyObj = albumKeyMap[item.album_id];
+      const decImageBuffer = decrypt(
+        albumKeyObj.alg,
+        albumKeyObj.vaultKeyBuf,
+        encImageBuffer,
+      );
       const unencPath = storeUnencImage(decImageBuffer, item.id);
       imageMap[item.id] = {
         itemPath: unencPath,
