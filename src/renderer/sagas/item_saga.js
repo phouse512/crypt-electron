@@ -87,6 +87,8 @@ function* fetchItemsSaga(action) {
       muk: mukObj,
     })
 
+    console.log(metadataResp);
+
     yield put(setItemsData({ itemMap: metadataResp.data.itemMap }));
   } catch (error) {
     console.error('Unable to fetch items with: ', error)
@@ -137,7 +139,7 @@ function* postItemSaga(action) {
 
     const newObj = {};
     action.itemMetadata.forEach((item) => {
-      newObj[item.key] = newObj[item.value];
+      newObj[item.key] = item.value;
     });
 
     const resp = yield ipc.callMain(ipcConstants.GET_ENCRYPTED_METADATA, {

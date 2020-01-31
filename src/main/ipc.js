@@ -473,8 +473,6 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
 
 ipc.answerRenderer(ipcConstants.CREATE_ALBUM, async data => {
   try {
-    console.log('made it')
-    console.log(data);
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
 
     // generate aes vault key // CREATE KEYSET
@@ -591,8 +589,6 @@ ipc.answerRenderer(ipcConstants.DECRYPT_ITEM_METADATA, async data => {
       }
 
       const albumKeyObj = albumKeyMap[item.album_id];
-      console.log('album key obj: ', albumKeyObj);
-      console.log(item.metadata);
       const decryptedMetadata = decrypt(
         albumKeyObj.alg,
         albumKeyObj.vaultKeyBuf,
