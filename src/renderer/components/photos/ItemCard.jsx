@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const getDisplayClass = (item) => {
+export const getDisplayClass = (item) => {
   let orientationClass = 'orientation-1';
   if (item.decryptedMetadata && item.decryptedMetadata.metadata) {
     switch (item.decryptedMetadata.metadata.Orientation) {

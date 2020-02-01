@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { getDisplayClass } from '../photos/ItemCard';
+
 const Album = ({
   decryptedName,
   goToAlbum,
@@ -26,7 +28,7 @@ const Album = ({
       </div>
       <div className="album-card__body">
         {recentItems.map(item => (
-          <div>
+          <div className={getDisplayClass(item)}>
             <img src={item.itemPath}/>
           </div>
         ))}
