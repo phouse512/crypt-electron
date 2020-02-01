@@ -60,7 +60,7 @@ ipc.answerRenderer(ipcConstants.CHECK_EXISTING_USER, async data => {
       // TODO: validate that the data file is valid
       let rawData = fs.readFileSync(userConfigPath);
       let jsonData = JSON.parse(rawData);
-      console.log(jsonData);
+      // console.log(jsonData);
       return {
         error: false,
         data: {
@@ -332,6 +332,10 @@ ipc.answerRenderer(ipcConstants.GET_PHOTO_DATA, async data => {
                 'YYYY:MM:DD HH:mm:ss',
               ).unix(),
             },
+            {
+              key: 'Orientation',
+              value: exifData.image.Orientation,
+            },
           ],
         },
       };
@@ -473,8 +477,6 @@ ipc.answerRenderer(ipcConstants.LOAD_ENCRYPTED_PHOTOS, async data => {
 
 ipc.answerRenderer(ipcConstants.CREATE_ALBUM, async data => {
   try {
-    console.log('made it')
-    console.log(data);
     const mukBuffer = Buffer.from(data.muk.k, 'base64');
 
     // generate aes vault key // CREATE KEYSET
@@ -591,8 +593,6 @@ ipc.answerRenderer(ipcConstants.DECRYPT_ITEM_METADATA, async data => {
       }
 
       const albumKeyObj = albumKeyMap[item.album_id];
-      console.log('album key obj: ', albumKeyObj);
-      console.log(item.metadata);
       const decryptedMetadata = decrypt(
         albumKeyObj.alg,
         albumKeyObj.vaultKeyBuf,

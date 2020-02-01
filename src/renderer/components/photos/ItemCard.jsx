@@ -1,13 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+export const getDisplayClass = (item) => {
+  let orientationClass = 'orientation-1';
+  if (item.decryptedMetadata && item.decryptedMetadata.metadata) {
+    switch (item.decryptedMetadata.metadata.Orientation) {
+      case 3:
+        orientationClass = 'orientation-3';
+        break;
+      case 6:
+        orientationClass = 'orientation-6';
+        break;
+      case 8:
+        orientationClass = 'orientation-8';
+        break;
+      default:
+        orientationClass = 'orientation-1';
+    }
+  }
+
+  return orientationClass;
+}
+
 const ItemCard = ({
   item,
   openHandler,
 }) => {
+  const orientationClass = getDisplayClass(item);
   return (
     <div
-      className="item-card"
+      className={`item-card ${orientationClass}`}
       onClick={() => openHandler(item)}
     >
       <img

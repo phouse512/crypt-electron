@@ -38,15 +38,18 @@
   padding: $sm-margin;
 
   .item-card {
+    border: 1px solid $grey-light; 
     border-radius: 3px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: $sm-margin;
     max-height: 100px;
     max-width: 100px;
     min-height: 100px;
     min-width: 100px;
     overflow: hidden;
-    background-color: green;
 
     img {
       max-height: 100%;
@@ -165,14 +168,60 @@
 
     .list-view {
       font-family: 'Work Sans';
+      font-size: 12px;
       padding-bottom: $sm-padding;
       padding-top: $sm-padding;
 
       &__item {
         margin-bottom: $sm-margin;
         margin-top: $sm-margin;
-        min-height: 20px;
+        // min-height: 20px;
       }
     }
   }
+}
+
+.orientation-1 {
+  // no rotation required for 1
+  -webkit-transform:rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -ms-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
+
+  display: flex;
+  justify-content: center;
+}
+
+.orientation-8 {
+  // rotate 270 degrees to flip
+  -webkit-transform:rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+  transform: rotate(270deg);
+
+  display: flex;
+  justify-content: center;
+}
+
+.orientation-3 {
+  // rotate 180 degrees to flip
+  -webkit-transform:rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.orientation-6 {
+  // rotate 90 degrees to flip
+  -webkit-transform:rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+
+  display: flex;
+  justify-content: center;
 }

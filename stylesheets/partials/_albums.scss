@@ -22,15 +22,21 @@
 
     .album-card__header {
       border-bottom: 1px solid $grey-light;
+      display: flex;
       min-height: 20px;
       max-height: 20px;
       padding: $sm-padding;
 
-      span {
+      div.title {
+        flex: 6;
+        overflow: hidden;
+      }
+
+      div.count {
         background-color: $accent-0;
         border-radius: 3px;
         color: white;
-        float: right;
+        flex: 1;
         font-size: 12px;
         height: 16px;
         // margin-top: 2px;

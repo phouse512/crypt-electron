@@ -1,0 +1,5 @@
+
+- auto format timestamp in the UI - DONE
+- gather rotation information from EXIF - DONE
+- use rotation in render - DONE
+- add album sharing logic

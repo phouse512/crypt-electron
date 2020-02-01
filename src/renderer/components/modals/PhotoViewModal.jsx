@@ -1,6 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactModal from 'react-modal';
+import moment from 'moment';
+
+const renderMetadata = (metadataObj) => {
+  let returnObj = [];
+  Object.keys(metadataObj).map(key => {
+    let title, value;
+    switch(key) {
+      case 'Timestamp':
+        const momentObj = moment.unix(metadataObj[key])
+        title = key;
+        value = momentObj.format('MM-DD-YY HH:mm:ss');
+        break;
+      default:
+        title = key;
+        value = metadataObj[key];
+    }
+
+    returnObj.push((
+      <div key={key} className="list-view__item">
+        <b>{title}:</b> {value}
+      </div>
+    ));
+  });
+  return returnObj;
+};
+
+const SinglePhoto = ({ itemPath, orientation }) => {
+  let orientationClass;
+  switch (orientation) {
+    case 3:
+      orientationClass = 'orientation-3';
+      break;
+    case 6:
+      orientationClass = 'orientation-6';
+      break;
+    case 8:
+      orientationClass = 'orientation-8';
+      break;
+    default:
+      orientationClass = 'orientation-1';
+  }
+
+  return (
+    <div className={orientationClass}>
+      <img src={itemPath} />
+    </div>
+  );
+};
 
 const PhotoViewModal = ({
   changeViewMetadata,
@@ -16,16 +64,14 @@ const PhotoViewModal = ({
   if (currentItem) {
     // render list of metadata
     let metadataList;
+    let orientation = 1;
     if (currentItem.decryptedMetadata && currentItem.decryptedMetadata.metadata) {
-      metadataList = (
-        Object.keys(currentItem.decryptedMetadata.metadata).map(key => {
-          return (
-            <div className="list-view__item">
-              <b>{key}:</b> {currentItem.decryptedMetadata.metadata[key]}
-            </div>
-          );
-        })
-      );
+      metadataList = renderMetadata(currentItem.decryptedMetadata.metadata);
+
+      // set orientation if exists
+      if (currentItem.decryptedMetadata.metadata.Orientation) {
+        orientation = currentItem.decryptedMetadata.metadata.Orientation;
+      }
     }
 
     itemView = (
@@ -38,7 +84,7 @@ const PhotoViewModal = ({
         </div>
         <div className={`info-overlay` + (viewMetadata ? ` dark` : ``)}>
           <div className="info-overlay__item">
-            <i class="fas fa-arrow-left"></i>
+            <i className="fas fa-arrow-left"></i>
           </div>
           <div 
             className="info-overlay__item"
@@ -47,7 +93,7 @@ const PhotoViewModal = ({
             <i className="fas fa-info-circle"></i>
           </div>
           <div className="info-overlay__item">
-            <i class="fas fa-arrow-right"></i>
+            <i className="fas fa-arrow-right"></i>
           </div>
         </div>
         {/* <div className="photo-view__change next">
@@ -61,9 +107,10 @@ const PhotoViewModal = ({
           </div>
         </div> */}
         <div className="photo-view__image">
-          <div>
-            <img src={currentItem.itemPath} />
-          </div>
+          <SinglePhoto
+            itemPath={currentItem.itemPath}
+            orientation={orientation}
+          />
         </div>
         { viewMetadata &&
           <div className="photo-view__metadata">
