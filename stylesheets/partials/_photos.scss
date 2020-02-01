@@ -38,15 +38,18 @@
   padding: $sm-margin;
 
   .item-card {
+    border: 1px solid $grey-light; 
     border-radius: 3px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: $sm-margin;
     max-height: 100px;
     max-width: 100px;
     min-height: 100px;
     min-width: 100px;
     overflow: hidden;
-    background-color: green;
 
     img {
       max-height: 100%;
