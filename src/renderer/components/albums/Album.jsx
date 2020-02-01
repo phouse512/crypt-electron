@@ -5,6 +5,7 @@ const Album = ({
   decryptedName,
   goToAlbum,
   id,
+  key,
   name,
   recentItems,
   size,
@@ -14,7 +15,8 @@ const Album = ({
     displayName = "decrypting.."
   }
   return (
-    <div 
+    <div
+      key={key}
       onClick={() => goToAlbum(id)} 
       className="album-card"
     >
@@ -39,6 +41,7 @@ Album.PropTypes = {
   decryptedName: PropTypes.string.isRequired,
   goToAlbum: PropTypes.func.isRequired,
   id: PropTypes.number.isRequired,
+  key: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   recentItems: PropTypes.shape({
     id: PropTypes.number.isRequired,

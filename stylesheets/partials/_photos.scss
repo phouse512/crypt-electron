@@ -165,13 +165,14 @@
 
     .list-view {
       font-family: 'Work Sans';
+      font-size: 12px;
       padding-bottom: $sm-padding;
       padding-top: $sm-padding;
 
       &__item {
         margin-bottom: $sm-margin;
         margin-top: $sm-margin;
-        min-height: 20px;
+        // min-height: 20px;
       }
     }
   }
