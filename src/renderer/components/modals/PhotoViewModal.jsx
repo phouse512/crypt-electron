@@ -27,6 +27,29 @@ const renderMetadata = (metadataObj) => {
   return returnObj;
 };
 
+const SinglePhoto = ({ itemPath, orientation }) => {
+  let orientationClass;
+  switch (orientation) {
+    case 3:
+      orientationClass = 'orientation-3';
+      break;
+    case 6:
+      orientationClass = 'orientation-6';
+      break;
+    case 8:
+      orientationClass = 'orientation-8';
+      break;
+    default:
+      orientationClass = 'orientation-1';
+  }
+
+  return (
+    <div className={orientationClass}>
+      <img src={itemPath} />
+    </div>
+  );
+};
+
 const PhotoViewModal = ({
   changeViewMetadata,
   closeHandler,
@@ -41,8 +64,14 @@ const PhotoViewModal = ({
   if (currentItem) {
     // render list of metadata
     let metadataList;
+    let orientation = 1;
     if (currentItem.decryptedMetadata && currentItem.decryptedMetadata.metadata) {
       metadataList = renderMetadata(currentItem.decryptedMetadata.metadata);
+
+      // set orientation if exists
+      if (currentItem.decryptedMetadata.metadata.Orientation) {
+        orientation = currentItem.decryptedMetadata.metadata.Orientation;
+      }
     }
 
     itemView = (
@@ -78,9 +107,10 @@ const PhotoViewModal = ({
           </div>
         </div> */}
         <div className="photo-view__image">
-          <div>
-            <img src={currentItem.itemPath} />
-          </div>
+          <SinglePhoto
+            itemPath={currentItem.itemPath}
+            orientation={orientation}
+          />
         </div>
         { viewMetadata &&
           <div className="photo-view__metadata">

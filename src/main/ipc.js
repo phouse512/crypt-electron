@@ -60,7 +60,7 @@ ipc.answerRenderer(ipcConstants.CHECK_EXISTING_USER, async data => {
       // TODO: validate that the data file is valid
       let rawData = fs.readFileSync(userConfigPath);
       let jsonData = JSON.parse(rawData);
-      console.log(jsonData);
+      // console.log(jsonData);
       return {
         error: false,
         data: {
@@ -331,6 +331,10 @@ ipc.answerRenderer(ipcConstants.GET_PHOTO_DATA, async data => {
                 exifData.exif.DateTimeOriginal,
                 'YYYY:MM:DD HH:mm:ss',
               ).unix(),
+            },
+            {
+              key: 'Orientation',
+              value: exifData.image.Orientation,
             },
           ],
         },

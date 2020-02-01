@@ -18,14 +18,14 @@ export const genA = (params, secret1) => {
 
   // convert secret1 to bignum
   const aNum = toBigIntBE(secret1);
-  console.log(typeof params.g);
-  console.log(typeof aNum);
-  console.log(typeof params.N);
+  // console.log(typeof params.g);
+  // console.log(typeof aNum);
+  // console.log(typeof params.N);
   // console.log(typeof (params.g ** aNum));
-  console.log(`aNum inside genA: ${aNum}`);
+  // console.log(`aNum inside genA: ${aNum}`);
   // const A = (params.g ** aNum) % params.N;
   const A = euclideanModPow(bigInt(params.g), aNum, params.N);
-  console.log(`ANum inside genA: ${A}`);
+  // console.log(`ANum inside genA: ${A}`);
   return A.toString('16');
 };
 
@@ -77,7 +77,7 @@ export const getk = (params) => {
  */
 const euclideanModPow = (a, b, m) => {
   var x = bigInt(a).modPow(b, m);
-  console.log(`x: ${x.toString(10)}`)
+  // console.log(`x: ${x.toString(10)}`)
   return x.isNegative() ? x.add(m) : x;
 }
 
