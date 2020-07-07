@@ -28,7 +28,7 @@
     "chai": "^4.2.0",
     "css-loader": "^3.2.0",
     "devtron": "^1.4.0",
-    "electron": "^5.0.2",
+    "electron": "^7.2.4",
     "electron-devtools-installer": "^2.2.4",
     "mocha": "^6.1.4",
     "node-sass": "^4.12.0",
