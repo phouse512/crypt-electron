@@ -47,7 +47,7 @@
     "exif": "^0.6.0",
     "futoin-hkdf": "^1.0.3",
     "moment": "^2.24.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-modal": "^3.10.1",
