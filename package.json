@@ -46,7 +46,7 @@
     "electron-better-ipc": "0.2.0",
     "exif": "^0.6.0",
     "futoin-hkdf": "^1.0.3",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "node-fetch": "^2.6.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
